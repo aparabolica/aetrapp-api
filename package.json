@@ -1,10 +1,52 @@
 {
   "name": "aetrapp-webapp",
-  "version": "0.1.0",
   "description": "Aetrapp Web Application",
-  "author": "Vitor George <vitor.george@aparabolica.com.br>",
-  "license": "MIT",
+  "version": "0.1.0",
+  "homepage": "www.aetrapp.org",
+  "main": "src",
+  "keywords": [
+    "feathers"
+  ],
+  "author": {
+    "name": "Vitor George",
+    "email": "vitor.george@aparabolica.com.br"
+  },
+  "contributors": [],
+  "bugs": {},
+  "directories": {
+    "lib": "src",
+    "test": "test/"
+  },
+  "engines": {
+    "node": ">= 6.0.0",
+    "yarn": ">= 0.18.0"
+  },
+  "scripts": {
+    "test": "npm run eslint && npm run mocha",
+    "eslint": "eslint src/. test/. --config .eslintrc.json",
+    "start": "node src/",
+    "mocha": "mocha test/ --recursive"
+  },
   "dependencies": {
-    "sequelize": "^4.11.0"
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.0",
+    "cors": "^2.8.4",
+    "feathers": "^2.2.1",
+    "feathers-authentication": "^1.2.7",
+    "feathers-authentication-hooks": "^0.1.4",
+    "feathers-authentication-jwt": "^0.3.2",
+    "feathers-authentication-local": "^0.4.4",
+    "feathers-configuration": "^0.4.1",
+    "feathers-errors": "^2.9.2",
+    "feathers-hooks": "^2.0.4",
+    "feathers-hooks-common": "^3.7.3",
+    "feathers-rest": "^1.8.0",
+    "feathers-sequelize": "^2.3.1",
+    "feathers-socketio": "^2.0.0",
+    "helmet": "^3.8.1",
+    "pg": "^7.3.0",
+    "sequelize": "^4.11.0",
+    "serve-favicon": "^2.4.4",
+    "winston": "^2.3.1"
   }
 }
