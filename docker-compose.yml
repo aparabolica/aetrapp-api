@@ -1,0 +1,10 @@
+version: '2'
+services:
+  postgres:
+    image: mdillon/postgis:9.6
+    ports:
+      - 15432:5432
+    environment:
+      - POSTGRES_DB=aetrapp
+      - POSTGRES_USER=aetrapp
+      - POSTGRES_PASSWORD=aetrapp    
