@@ -1,0 +1,10 @@
+{
+  "name": "aetrapp-webapp",
+  "version": "0.1.0",
+  "description": "Aetrapp Web Application",
+  "author": "Vitor George <vitor.george@aparabolica.com.br>",
+  "license": "MIT",
+  "dependencies": {
+    "sequelize": "^4.11.0"
+  }
+}
