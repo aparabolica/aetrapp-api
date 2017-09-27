@@ -2,27 +2,26 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('users', {
+    return queryInterface.createTable('traps', {
+      // shortid https://www.npmjs.com/package/shortid
       id: {
-        type: Sequelize.UUID,
+        type: Sequelize.STRING(7),
         primaryKey: true
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
+      },     
 
-      // personal info
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false
+      // properties
+      statusCode: {
+        type: Sequelize.INTEGER
       },
-      dateOfBirth: {
-        type: Sequelize.DATE,
+      statusMessage: {
+        type: Sequelize.TEXT
       },
-      gender: {
+      title: {
         type: Sequelize.STRING
       },
+      notes: {
+        type: Sequelize.TEXT,
+      },     
 
       // location
       coordinates: {
@@ -44,25 +43,7 @@ module.exports = {
         type: Sequelize.STRING
       },
 
-      // contact
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      landlineNumber: {
-        type: Sequelize.STRING
-      },
-      cellphoneNumber: {
-        type: Sequelize.STRING
-      },
-
-      // meta
-      roles: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
-      },
-
-      // timestamp
+      // timestamps
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
@@ -75,6 +56,6 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('traps');
   }
 };
