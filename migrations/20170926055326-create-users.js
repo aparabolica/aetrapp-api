@@ -4,12 +4,34 @@ module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.createTable('users', {
       id: {
-        type: Sequelize.UUID,
+        type: Sequelize.STRING(14),
         primaryKey: true
       },
-      password: {
+      passwordHash: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      salt: {
+        type: Sequelize.STRING
+      },
+
+      // e-mail
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      emailVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+
+      // phone numbers
+      landlineNumber: {
+        type: Sequelize.STRING
+      },
+      cellphoneNumber: {
+        type: Sequelize.STRING
       },
 
       // personal info
@@ -18,7 +40,7 @@ module.exports = {
         allowNull: false
       },
       dateOfBirth: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       gender: {
         type: Sequelize.STRING
@@ -44,26 +66,20 @@ module.exports = {
         type: Sequelize.STRING
       },
 
-      // contact
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
-      },
-      landlineNumber: {
-        type: Sequelize.STRING
-      },
-      cellphoneNumber: {
-        type: Sequelize.STRING
-      },
-
       // meta
       roles: {
         type: Sequelize.ARRAY(Sequelize.STRING)
       },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      },
 
       // timestamp
       createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      lastSignedInAt: {
         type: Sequelize.DATE,
         allowNull: false
       },
