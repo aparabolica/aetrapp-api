@@ -7,12 +7,9 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true
       },
-      passwordHash: {
+      password: {
         type: Sequelize.STRING,
         allowNull: false
-      },
-      salt: {
-        type: Sequelize.STRING
       },
 
       // e-mail
@@ -60,8 +57,7 @@ module.exports = {
         allowNull: false
       },
       lastSignedInAt: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.DATE
       },
       updatedAt: {
         type: Sequelize.DATE,
