@@ -4,7 +4,7 @@ module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.createTable('users', {
       id: {
-        type: Sequelize.STRING(14),
+        type: Sequelize.STRING,
         primaryKey: true
       },
       passwordHash: {
@@ -43,26 +43,6 @@ module.exports = {
         type: Sequelize.DATEONLY,
       },
       gender: {
-        type: Sequelize.STRING
-      },
-
-      // location
-      coordinates: {
-        type: Sequelize.GEOMETRY('POINT', 4326)
-      },
-      postalcode: {
-        type: Sequelize.STRING
-      },
-      addressStreet: {
-        type: Sequelize.STRING
-      },
-      addressNumber: {
-        type: Sequelize.STRING
-      },
-      addressComplement: {
-        type: Sequelize.STRING
-      },
-      cityId: {
         type: Sequelize.STRING
       },
 

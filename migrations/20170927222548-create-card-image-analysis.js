@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.createTable('cardImageAnalyses', {
       // shortid https://www.npmjs.com/package/shortid
       id: {
-        type: Sequelize.STRING(7),
+        type: Sequelize.STRING,
         primaryKey: true
       },     
 

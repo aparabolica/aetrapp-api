@@ -5,9 +5,9 @@ module.exports = {
     return queryInterface.createTable('traps', {
       // shortid https://www.npmjs.com/package/shortid
       id: {
-        type: Sequelize.STRING(7),
+        type: Sequelize.STRING,
         primaryKey: true
-      },     
+      },
 
       // properties
       statusCode: {
@@ -24,10 +24,19 @@ module.exports = {
       },     
 
       // location
-      coordinates: {
+      location: {
         type: Sequelize.GEOMETRY('POINT', 4326)
       },
-      postalcode: {
+      addressStateCode: {
+        type: Sequelize.STRING
+      },
+      addressCitySlug: {
+        type: Sequelize.STRING
+      },
+      addressNeighborhood: {
+        type: Sequelize.STRING
+      },
+      addressPostcode: {
         type: Sequelize.STRING
       },
       addressStreet: {
@@ -40,6 +49,11 @@ module.exports = {
         type: Sequelize.STRING
       },
       cityId: {
+        type: Sequelize.STRING
+      },
+
+      // relations
+      ownerId: {
         type: Sequelize.STRING
       },
 
