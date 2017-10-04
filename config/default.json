@@ -30,5 +30,5 @@
       "passwordField": "password"
     }
   },
-  "postgres": "postgres://aetrapp:aetrapp@localhost:15432/aetrapp"
+  "postgres": "postgres://aetrapp:aetrapp@postgres:5432/aetrapp"
 }

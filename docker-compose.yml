@@ -5,8 +5,25 @@ services:
     ports:
       - 15432:5432
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data      
+      - ./data/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=aetrapp
       - POSTGRES_USER=aetrapp
-      - POSTGRES_PASSWORD=aetrapp    
+      - POSTGRES_PASSWORD=aetrapp
+  app:
+    build: .
+    # Comment-out below for production
+    command: nodemon src/
+    links:
+      - postgres
+    ports:
+    - 3030:3030
+    volumes:
+    # Development volumes. Comment-out for production
+    - /src/node_modules
+    - .:/src
+    # Uncomment below for production (persist app data)
+    # - ./.data/files:/src/files
+    # - ./.data/public:/src/public
+    environment:
+      NODE_ENV: development
