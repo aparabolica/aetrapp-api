@@ -7,22 +7,22 @@ module.exports = {
       id: {
         type: Sequelize.STRING,
         primaryKey: true
-      },     
+      },
 
       // properties
       eggCount: {
         type: Sequelize.INTEGER
-      },      
+      },
       statusCode: {
         type: Sequelize.INTEGER,
-      },     
+      },
       statusMessage: {
         type: Sequelize.TEXT,
       },
       analisysData: {
         type: Sequelize.JSON
       },
-      
+
       // relations
       cardImageId: {
         type: Sequelize.STRING,
@@ -34,7 +34,7 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      retrievedAt: {
+      finishedAt: {
         type: Sequelize.DATE
       }
     });

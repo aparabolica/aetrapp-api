@@ -18,7 +18,7 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      emailVerified: {
+      emailIsVerified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },

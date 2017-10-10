@@ -7,22 +7,25 @@ module.exports = {
       id: {
         type: Sequelize.STRING,
         primaryKey: true
-      },     
+      },
 
       // properties
       name: {
         type: Sequelize.STRING
-      },      
+      },
       adminLevel: {
         type: Sequelize.STRING,
-      },     
+      },
       boudingBox: {
         type: Sequelize.ARRAY(Sequelize.GEOMETRY('POINT', 4326)),
       },
       coordinates: {
         type: Sequelize.GEOMETRY('POINT', 4326)
       },
-      
+
+      // relation
+      parendId: Sequelize.STRING,
+
       // timestamps
       createdAt: {
         type: Sequelize.DATE,

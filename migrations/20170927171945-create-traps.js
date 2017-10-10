@@ -16,28 +16,17 @@ module.exports = {
       statusMessage: {
         type: Sequelize.TEXT
       },
+      daysToCollect: Sequelize.INTEGER,
       title: {
         type: Sequelize.STRING
       },
       notes: {
         type: Sequelize.TEXT,
-      },     
+      },
 
       // location
-      location: {
+      coordinates: {
         type: Sequelize.GEOMETRY('POINT', 4326)
-      },
-      addressStateCode: {
-        type: Sequelize.STRING
-      },
-      addressCitySlug: {
-        type: Sequelize.STRING
-      },
-      addressNeighborhood: {
-        type: Sequelize.STRING
-      },
-      addressPostcode: {
-        type: Sequelize.STRING
       },
       addressStreet: {
         type: Sequelize.STRING
@@ -48,7 +37,16 @@ module.exports = {
       addressComplement: {
         type: Sequelize.STRING
       },
-      cityId: {
+      addressNeighborhood: {
+        type: Sequelize.STRING
+      },
+      addressPostcode: {
+        type: Sequelize.STRING
+      },
+      addressCityId: {
+        type: Sequelize.STRING
+      },
+      addressStateId: {
         type: Sequelize.STRING
       },
 

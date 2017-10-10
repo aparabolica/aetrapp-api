@@ -7,22 +7,22 @@ module.exports = {
       id: {
         type: Sequelize.STRING,
         primaryKey: true
-      },     
+      },
 
       // properties
-      mapOrder: {
+      level: {
         type: Sequelize.INTEGER
-      },      
+      },
       title: {
         type: Sequelize.STRING,
-      },     
+      },
       description: {
         type: Sequelize.TEXT,
       },
       filePath: {
         type: Sequelize.STRING
       },
-      
+
       // timestamps
       createdAt: {
         type: Sequelize.DATE,

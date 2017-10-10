@@ -7,24 +7,31 @@ module.exports = {
       id: {
         type: Sequelize.STRING,
         primaryKey: true
-      },     
+      },
 
       // properties
-      filePath: {
-        type: Sequelize.STRING
+      caption: {
+        type: Sequelize.TEXT
+      },
+      fileUrl: {
+        type: Sequelize.STRING,
       },
       exifData: {
         type: Sequelize.JSON,
-      },     
+      },
 
       // relations
       trapId: {
         type: Sequelize.STRING,
         allowNull: false
-      },      
+      },
 
       // timestamps (no updates)
       createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
         type: Sequelize.DATE,
         allowNull: false
       }
