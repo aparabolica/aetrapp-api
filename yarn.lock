@@ -120,7 +120,7 @@ bluebird@^3.4.6:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.0.tgz#791420d7f551eea2897453a8a77653f96606d67c"
 
-body-parser@^1.18.2:
+body-parser@1.18.2:
   version "1.18.2"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.2.tgz#87678a19d84b47d859b83199bd59bce222b10454"
   dependencies:
@@ -192,7 +192,7 @@ compressible@~2.0.10:
   dependencies:
     mime-db ">= 1.29.0 < 2"
 
-compression@^1.7.0:
+compression@1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/compression/-/compression-1.7.0.tgz#030c9f198f1643a057d776a738e922da4373012d"
   dependencies:
@@ -246,7 +246,7 @@ core-js@^2.4.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.1.tgz#ae6874dc66937789b80754ff5428df66819ca50b"
 
-cors@^2.8.4:
+cors@2.8.4:
   version "2.8.4"
   resolved "https://registry.yarnpkg.com/cors/-/cors-2.8.4.tgz#2bd381f2eb201020105cd50ea59da63090694686"
   dependencies:
@@ -429,7 +429,7 @@ feathers-authentication-client@^0.3.1:
     feathers-errors "^2.4.0"
     jwt-decode "^2.1.0"
 
-feathers-authentication-hooks@^0.1.4:
+feathers-authentication-hooks@0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/feathers-authentication-hooks/-/feathers-authentication-hooks-0.1.4.tgz#0e8079efc9add3572531ea352cb5bc46660be368"
   dependencies:
@@ -439,7 +439,7 @@ feathers-authentication-hooks@^0.1.4:
     lodash.isplainobject "^4.0.6"
     lodash.set "^4.3.2"
 
-feathers-authentication-jwt@^0.3.2:
+feathers-authentication-jwt@0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/feathers-authentication-jwt/-/feathers-authentication-jwt-0.3.2.tgz#c49463a4faf5457ec697c91b70df775feeb81a2e"
   dependencies:
@@ -450,7 +450,7 @@ feathers-authentication-jwt@^0.3.2:
     lodash.pick "^4.4.0"
     passport-jwt "^2.2.1"
 
-feathers-authentication-local@^0.4.4:
+feathers-authentication-local@0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/feathers-authentication-local/-/feathers-authentication-local-0.4.4.tgz#eed529520f69e68503291adf6ba76e3e4f615872"
   dependencies:
@@ -463,7 +463,7 @@ feathers-authentication-local@^0.4.4:
     lodash.pick "^4.4.0"
     passport-local "^1.0.0"
 
-feathers-authentication@^1.2.7:
+feathers-authentication@1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/feathers-authentication/-/feathers-authentication-1.2.7.tgz#8cc5c0047f04fabfafcdf6eb392c72038817bf05"
   dependencies:
@@ -485,22 +485,22 @@ feathers-commons@^0.8.0, feathers-commons@^0.8.4, feathers-commons@^0.8.6, feath
   version "0.8.7"
   resolved "https://registry.yarnpkg.com/feathers-commons/-/feathers-commons-0.8.7.tgz#11c6f25b537745a983e8d61552d7db8932d53782"
 
-feathers-configuration@^0.4.1:
+feathers-configuration@0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/feathers-configuration/-/feathers-configuration-0.4.1.tgz#8384e792fa44edf8954f02dfc57199e010029803"
   dependencies:
     config "^1.21.0"
     debug "^2.2.0"
 
-feathers-errors@^2.0.1, feathers-errors@^2.2.0, feathers-errors@^2.4.0, feathers-errors@^2.5.0, feathers-errors@^2.9.2:
+feathers-errors@2.9.2, feathers-errors@^2.0.1, feathers-errors@^2.2.0, feathers-errors@^2.4.0, feathers-errors@^2.5.0:
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/feathers-errors/-/feathers-errors-2.9.2.tgz#96ca0e5fe50cc56f0eccc90ce3fa5e1f8840828d"
   dependencies:
     debug "^3.0.0"
 
-feathers-hooks-common@^3.7.3:
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/feathers-hooks-common/-/feathers-hooks-common-3.7.3.tgz#c84c47d2f0f3a117dc7547356795c45ee14cb30c"
+feathers-hooks-common@3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/feathers-hooks-common/-/feathers-hooks-common-3.10.0.tgz#2ae7dc54091ffa4609df8479c0bfa29dcd31d1a7"
   dependencies:
     ajv "^5.2.0"
     debug "^3.0.0"
@@ -508,9 +508,16 @@ feathers-hooks-common@^3.7.3:
     feathers-hooks "^2.0.1"
     traverse "^0.6.6"
 
-feathers-hooks@^2.0.1, feathers-hooks@^2.0.4:
+feathers-hooks@2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/feathers-hooks/-/feathers-hooks-2.0.4.tgz#b0b8939b7d9ceb6897c7f13eb790338da10848eb"
+  dependencies:
+    feathers-commons "^0.8.6"
+    uberproto "^1.2.0"
+
+feathers-hooks@^2.0.1:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/feathers-hooks/-/feathers-hooks-2.1.2.tgz#f97af10f38621df816d754766c5c2e180b7df951"
   dependencies:
     feathers-commons "^0.8.6"
     uberproto "^1.2.0"
@@ -521,7 +528,7 @@ feathers-query-filters@^2.0.0:
   dependencies:
     feathers-commons "^0.8.0"
 
-feathers-rest@^1.8.0:
+feathers-rest@1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/feathers-rest/-/feathers-rest-1.8.0.tgz#3c03f1ea56adec940a8f9823d87a3aafeb9742a9"
   dependencies:
@@ -530,9 +537,9 @@ feathers-rest@^1.8.0:
     feathers-errors "^2.0.1"
     qs "^6.4.0"
 
-feathers-sequelize@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/feathers-sequelize/-/feathers-sequelize-2.3.1.tgz#5e4ad425d5df3f17c9225fbfc60cd6e3e7d1dd1c"
+feathers-sequelize@2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/feathers-sequelize/-/feathers-sequelize-2.3.2.tgz#49bbd6a7cbc4159536369f2cacb08581e361f8c2"
   dependencies:
     feathers-commons "^0.8.4"
     feathers-errors "^2.0.1"
@@ -549,7 +556,7 @@ feathers-socket-commons@^2.0.0, feathers-socket-commons@^2.3.1:
     feathers-commons "^0.8.0"
     feathers-errors "^2.2.0"
 
-feathers-socketio@^2.0.0:
+feathers-socketio@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/feathers-socketio/-/feathers-socketio-2.0.0.tgz#ce62e33627deaad53279e4f9b67cdac0f2cf49de"
   dependencies:
@@ -559,7 +566,7 @@ feathers-socketio@^2.0.0:
     socket.io "^2.0.1"
     uberproto "^1.2.0"
 
-feathers@^2.2.1:
+feathers@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/feathers/-/feathers-2.2.1.tgz#d2bd90aefd0dabb7f317416ede57f33c11ed7339"
   dependencies:
@@ -636,7 +643,7 @@ helmet-csp@2.5.1:
     lodash.reduce "4.6.0"
     platform "1.3.4"
 
-helmet@^3.8.1:
+helmet@3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/helmet/-/helmet-3.8.1.tgz#bef2b68ffbaa19759e858c19cca7db213bb58b2d"
   dependencies:
@@ -970,7 +977,7 @@ pg-types@~1.12.1:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-pg@^7.3.0:
+pg@7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-7.3.0.tgz#275e27466e54a645f6b4a16f6acadf6b849ad83b"
   dependencies:
@@ -1092,7 +1099,29 @@ send@0.15.6:
     range-parser "~1.2.0"
     statuses "~1.3.1"
 
-sequelize@^4.11.0, sequelize@^4.3.1:
+sequelize@4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-4.17.0.tgz#9bdcc394a4b3aeaf92a7a6c6eb5cfcecb0034d2f"
+  dependencies:
+    bluebird "^3.4.6"
+    cls-bluebird "^2.0.1"
+    debug "^3.0.0"
+    depd "^1.1.0"
+    dottie "^2.0.0"
+    generic-pool "^3.1.8"
+    inflection "1.12.0"
+    lodash "^4.17.1"
+    moment "^2.13.0"
+    moment-timezone "^0.5.4"
+    retry-as-promised "^2.3.1"
+    semver "^5.0.1"
+    terraformer-wkt-parser "^1.1.2"
+    toposort-class "^1.0.1"
+    uuid "^3.0.0"
+    validator "^8.0.0"
+    wkx "^0.4.1"
+
+sequelize@^4.3.1:
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-4.11.0.tgz#0a75393aff97f4db584c88df8b76f38924cdc305"
   dependencies:
@@ -1114,7 +1143,7 @@ sequelize@^4.11.0, sequelize@^4.3.1:
     validator "^8.0.0"
     wkx "^0.4.1"
 
-serve-favicon@^2.4.4:
+serve-favicon@2.4.4:
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/serve-favicon/-/serve-favicon-2.4.4.tgz#412ddd74965151c9f74c0828f35d50c5250210de"
   dependencies:
@@ -1141,7 +1170,7 @@ shimmer@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/shimmer/-/shimmer-1.1.0.tgz#97d7377137ffbbab425522e429fe0aa89a488b35"
 
-shortid@^2.2.8:
+shortid@2.2.8:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.8.tgz#033b117d6a2e975804f6f0969dbe7d3d0b355131"
 
@@ -1274,7 +1303,7 @@ vary@^1, vary@~1.1.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
 
-winston@^2.3.1:
+winston@2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/winston/-/winston-2.3.1.tgz#0b48420d978c01804cf0230b648861598225a119"
   dependencies:

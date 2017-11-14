@@ -7,7 +7,7 @@
   "keywords": [
     "feathers"
   ],
-  "license" : "GPL-3.0",
+  "license": "GPL-3.0",
   "author": {
     "name": "Vitor George",
     "email": "vitor.george@aparabolica.com.br"
@@ -29,26 +29,26 @@
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "compression": "^1.7.0",
-    "cors": "^2.8.4",
-    "feathers": "^2.2.1",
-    "feathers-authentication": "^1.2.7",
-    "feathers-authentication-hooks": "^0.1.4",
-    "feathers-authentication-jwt": "^0.3.2",
-    "feathers-authentication-local": "^0.4.4",
-    "feathers-configuration": "^0.4.1",
-    "feathers-errors": "^2.9.2",
-    "feathers-hooks": "^2.0.4",
-    "feathers-hooks-common": "^3.7.3",
-    "feathers-rest": "^1.8.0",
-    "feathers-sequelize": "^2.3.1",
-    "feathers-socketio": "^2.0.0",
-    "helmet": "^3.8.1",
-    "pg": "^7.3.0",
-    "sequelize": "^4.11.0",
-    "serve-favicon": "^2.4.4",
-    "shortid": "^2.2.8",
-    "winston": "^2.3.1"
+    "body-parser": "1.18.2",
+    "compression": "1.7.0",
+    "cors": "2.8.4",
+    "feathers": "2.2.1",
+    "feathers-authentication": "1.2.7",
+    "feathers-authentication-hooks": "0.1.4",
+    "feathers-authentication-jwt": "0.3.2",
+    "feathers-authentication-local": "0.4.4",
+    "feathers-configuration": "0.4.1",
+    "feathers-errors": "2.9.2",
+    "feathers-hooks": "2.0.4",
+    "feathers-hooks-common": "3.10.0",
+    "feathers-rest": "1.8.0",
+    "feathers-sequelize": "2.3.2",
+    "feathers-socketio": "2.0.0",
+    "helmet": "3.8.1",
+    "pg": "7.3.0",
+    "sequelize": "4.17.0",
+    "serve-favicon": "2.4.4",
+    "shortid": "2.2.8",
+    "winston": "2.3.1"
   }
 }
