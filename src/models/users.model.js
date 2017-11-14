@@ -24,7 +24,7 @@ module.exports = function (app) {
       allowNull: false,
       unique: true
     },
-    emailVerified: {
+    emailIsVerified: {
       type: Sequelize.BOOLEAN,
       defaultValue: false
     },

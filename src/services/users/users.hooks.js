@@ -1,35 +1,38 @@
-const { authenticate } = require('feathers-authentication').hooks;
-const commonHooks = require('feathers-hooks-common');
-const { restrictToOwner } = require('feathers-authentication-hooks');
+const { authenticate } = require("feathers-authentication").hooks;
+var common = require("feathers-hooks-common");
+var {
+  discard,
+  pluckQuery,
+  keep,
+  when
+} = common;
 
-const { hashPassword } = require('feathers-authentication-local').hooks;
+const { restrictToOwner } = require("feathers-authentication-hooks");
+const { hashPassword } = require("feathers-authentication-local").hooks;
 const restrict = [
-  authenticate('jwt'),
+  authenticate("jwt"),
   restrictToOwner({
-    idField: 'id',
-    ownerField: 'id'
+    idField: "id",
+    ownerField: "id"
   })
 ];
+
+const { findByEmail } = require("../../validations");
 
 module.exports = {
   before: {
     all: [],
-    find: [ authenticate('jwt') ],
-    get: [ ...restrict ],
-    create: [ hashPassword() ],
-    update: [ ...restrict, hashPassword() ],
-    patch: [ ...restrict, hashPassword() ],
-    remove: [ ...restrict ]
+    find: [pluckQuery("email"), findByEmail],
+    get: [...restrict],
+    create: [hashPassword()],
+    update: [...restrict, hashPassword()],
+    patch: [...restrict, hashPassword()],
+    remove: [...restrict]
   },
 
   after: {
-    all: [
-      commonHooks.when(
-        hook => hook.params.provider,
-        commonHooks.discard('password')
-      )
-    ],
-    find: [],
+    all: [when(hook => hook.params.provider, discard("password"))],
+    find: [keep("email")],
     get: [],
     create: [],
     update: [],
