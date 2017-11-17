@@ -40,7 +40,10 @@ app.use('/', feathers.static(app.get('public')));
 app.configure(hooks());
 app.configure(sequelize);
 app.configure(rest());
-app.configure(socketio());
+app.configure(socketio({
+  pingInterval: 10000,
+  pingTimeout: 50000
+}));
 
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
