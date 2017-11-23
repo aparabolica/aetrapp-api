@@ -6,7 +6,7 @@ const shortid = require('shortid');
 
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
-  const images = sequelizeClient.define('images', {
+  const images = sequelizeClient.define('cardImages', {
     // shortid https://www.npmjs.com/package/shortid
     id: {
       type: Sequelize.STRING,
