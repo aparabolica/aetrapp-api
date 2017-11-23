@@ -3,6 +3,8 @@ var common = require("feathers-hooks-common");
 var {
   discard,
   pluckQuery,
+  iff,
+  isProvider,
   keep,
   when
 } = common;
@@ -22,7 +24,7 @@ const { findByEmail } = require("../../validations");
 module.exports = {
   before: {
     all: [],
-    find: [pluckQuery("email"), findByEmail],
+    find: [iff(!isProvider("server"),[pluckQuery("email"), findByEmail])],
     get: [...restrict],
     create: [hashPassword()],
     update: [...restrict, hashPassword()],
@@ -32,7 +34,7 @@ module.exports = {
 
   after: {
     all: [when(hook => hook.params.provider, discard("password"))],
-    find: [keep("email")],
+    find: [iff(!isProvider("server"),keep("email"))],
     get: [],
     create: [],
     update: [],
