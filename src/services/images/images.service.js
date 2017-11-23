@@ -2,7 +2,6 @@
 const createService = require('feathers-sequelize');
 const createModel = require('../../models/images.model');
 const hooks = require('./images.hooks');
-const filters = require('./images.filters');
 
 module.exports = function () {
   const app = this;

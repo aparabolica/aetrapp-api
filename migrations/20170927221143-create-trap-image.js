@@ -25,6 +25,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      blobId: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
 
       // timestamps
       createdAt: {
