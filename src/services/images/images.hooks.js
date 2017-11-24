@@ -27,14 +27,14 @@ const storeBlob = function () {
 };
 
 const registerAnalysisJob = function () {
-  const ipsUrl = 'http://172.22.0.1:3131/agenda/api/jobs/create';
   return function (hook) {
+    const ipsUrl = hook.app.get("ipsUrl") + '/agenda/api/jobs/create';
     return axios.post(ipsUrl, {
         "jobName": "process image",
         "jobSchedule": "now",
         "jobData": {
-          "imageUrl": "https://github.com/aetrapp/image-processing-service/raw/master/samples/06.4SEM.CENC.INTRA.SONY.jpg",
-          "webhookUrl": `http://172.23.0.1:3030/images/analysis/${hook.result.id}`
+          "imageUrl": `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`,
+          "webhookUrl": `${hook.app.get("siteUrl")}/images/analysis/${hook.result.id}`
         }
     }).then(res => {
       return hook;

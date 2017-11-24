@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Host the public folder
-app.use('/', feathers.static(app.get('public')));
+app.use('/files', feathers.static(__dirname + '/../uploads'));
 
 // Set up Plugins and providers
 app.configure(hooks());

@@ -23,7 +23,7 @@ module.exports = function () {
   app.use('/images/analysis/:id', (req, res) => {
     console.log(req.body, req.params);
     service.patch(req.params.id, {
-      eggCount: req.body.results.eggs
+      eggCount: req.body.results.eggCount
     }).then(() => {
       res.send('ok');
     }).catch(() => {

@@ -27,3 +27,8 @@ services:
     # - ./.data/public:/src/public
     environment:
       NODE_ENV: development
+      NODE_CONFIG: |-
+        {
+          "siteUrl": "http://172.22.0.1:3030",
+          "ipsUrl": "http://172.23.0.1:3131"
+        }
