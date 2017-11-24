@@ -35,6 +35,19 @@ module.exports = function (app) {
       allowNull: false
     },
 
+    // analysis data
+    processed: {
+      type: Sequelize.BOOLEAN
+    },
+
+    processedAt: {
+      type: Sequelize.DATE
+    },
+
+    eggCount: {
+      type: Sequelize.INTEGER
+    },
+
     // timestamps (no updates)
     createdAt: {
       type: Sequelize.DATE,
