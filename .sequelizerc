@@ -1,5 +1,5 @@
-var config = require('./config/default.json');
+var config = require('config');
 
 module.exports = {
-    'url': config.postgres
+    'url': config.get("postgres")
 }
