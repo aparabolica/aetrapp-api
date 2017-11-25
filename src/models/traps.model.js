@@ -15,6 +15,15 @@ module.exports = function (app) {
     },
 
     // properties
+    // timestamps
+    startDate: {
+      type: Sequelize.DATE,
+      allowNull: false
+    },
+    endDate: {
+      type: Sequelize.DATE,
+      allowNull: false
+    },
     statusCode: {
       type: Sequelize.INTEGER
     },
@@ -27,6 +36,10 @@ module.exports = function (app) {
     },
     notes: {
       type: Sequelize.TEXT,
+    },
+
+    imageId: {
+      type: Sequelize.STRING
     },
 
     // location

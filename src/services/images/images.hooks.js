@@ -12,10 +12,6 @@ const restrict = [
   })
 ];
 
-const fakeData = hook => {
-  hook.data.trapId = 1;
-};
-
 const storeBlob = function () {
   return function (hook) {
     const blobService = hook.app.service('uploads');
@@ -44,12 +40,37 @@ const registerAnalysisJob = function () {
   }
 };
 
+const checkTrapId = function(hook){
+  return function(hook){
+    hook
+      .app.service('traps')
+      .get(hook.data.trapId)
+      .then(trap =>{
+        if (trap) return hook;
+        else new errors.BadRequest('Invalid trapId');
+      }).catch(err => {
+        return err;
+      });
+  }
+}
+
+const assignImageToTrap = function(hook){
+  return function(hook){
+    console.log(hook.result);
+    hook
+      .app.service('traps')
+      .patch(hook.result.trapId, {
+        imageId: hook.result.id
+      });
+  }
+}
+
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [ authenticate('jwt'), fakeData, storeBlob() ],
+    create: [ authenticate('jwt'), checkTrapId(), storeBlob() ],
     update: [...restrict],
     patch: [...restrict],
     remove: [...restrict]
@@ -59,7 +80,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ registerAnalysisJob() ],
+    create: [ registerAnalysisJob(), assignImageToTrap() ],
     update: [],
     patch: [],
     remove: []
