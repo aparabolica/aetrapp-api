@@ -34,9 +34,11 @@ module.exports = {
       processed: {
         type: Sequelize.BOOLEAN
       },
-
       processedAt: {
         type: Sequelize.DATE
+      },
+      eggCount: {
+        type: Sequelize.INTEGER
       },
 
       // timestamps (no updates)
