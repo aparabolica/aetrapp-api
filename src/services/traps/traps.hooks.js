@@ -26,7 +26,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ authenticate('jwt') ]
+    create: [ authenticate('jwt') ],
     update: [...restrict],
     patch: [...restrict],
     remove: [...restrict]
