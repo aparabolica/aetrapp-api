@@ -30,6 +30,15 @@ module.exports = {
         allowNull: false
       },
 
+      // analysis data
+      processed: {
+        type: Sequelize.BOOLEAN
+      },
+
+      processedAt: {
+        type: Sequelize.DATE
+      },
+
       // timestamps (no updates)
       createdAt: {
         type: Sequelize.DATE,
