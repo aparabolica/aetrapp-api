@@ -56,7 +56,6 @@ const checkTrapId = function(){
 
 const assignImageToTrap = function(){
   return function(hook){
-    console.log(hook.result);
     hook
       .app.service('traps')
       .patch(hook.result.trapId, {

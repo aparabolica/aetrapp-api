@@ -40,6 +40,16 @@ module.exports = function (app) {
       type: Sequelize.BOOLEAN,
       defaultValue: false
     },
+    error: {
+      type: Sequelize.JSON
+    },
+    analysisStartedAt: {
+      type: Sequelize.DATE
+    },
+    analysisFinishedAt: {
+      type: Sequelize.DATE
+    },
+
 
     processedAt: {
       type: Sequelize.DATE

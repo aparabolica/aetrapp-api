@@ -21,10 +21,10 @@ module.exports = function () {
   const service = app.service('images');
 
   app.use('/images/analysis/:id', (req, res) => {
-    console.log(req.body, req.params);
-    service.patch(req.params.id, {
-      eggCount: req.body.results.eggCount
-    }).then(() => {
+    const { results }= req.body;
+    service.patch(req.params.id, Object.assign({
+      processed: true}, results)
+    ).then(() => {
       res.send('ok');
     }).catch(() => {
       res.send('ok');
