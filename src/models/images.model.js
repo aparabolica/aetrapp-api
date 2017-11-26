@@ -37,7 +37,8 @@ module.exports = function (app) {
 
     // analysis data
     processed: {
-      type: Sequelize.BOOLEAN
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     },
 
     processedAt: {

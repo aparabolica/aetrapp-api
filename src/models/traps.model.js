@@ -14,6 +14,10 @@ module.exports = function (app) {
       primaryKey: true
     },
 
+    userOrder: {
+      type: Sequelize.INTEGER
+    },
+
     // properties
     // timestamps
     startDate: {

@@ -40,7 +40,7 @@ const registerAnalysisJob = function () {
   }
 };
 
-const checkTrapId = function(hook){
+const checkTrapId = function(){
   return function(hook){
     hook
       .app.service('traps')
@@ -54,7 +54,7 @@ const checkTrapId = function(hook){
   }
 }
 
-const assignImageToTrap = function(hook){
+const assignImageToTrap = function(){
   return function(hook){
     console.log(hook.result);
     hook

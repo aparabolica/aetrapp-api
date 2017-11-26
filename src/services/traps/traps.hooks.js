@@ -21,12 +21,43 @@ const imageSchema = {
   }
 }
 
+const setOwnerId = function(){
+  return function(hook){
+    hook.data.ownerId = hook.params.user.id;
+    return hook;
+  }
+}
+
+const setUserOrder = function(){
+  return function(hook){
+    const {ownerId} = hook.data;
+    return hook.app.service('traps').find({
+      query: {
+        ownerId,
+        '$sort': {
+          'createdAt': -1
+        },
+        '$limit': 1
+      }
+    }).then(traps => {
+      if (traps.data.length)
+        hook.data.userOrder = traps.data[0].userOrder + 1;
+      else
+        hook.data.userOrder = 1;
+      return hook;
+    }).catch(err => {
+      console.log(err);
+      hook.data.userOrder = 1;
+    })
+  }
+}
+
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [ authenticate('jwt') ],
+    create: [ authenticate('jwt'), setOwnerId(), setUserOrder() ],
     update: [...restrict],
     patch: [...restrict],
     remove: [...restrict]
