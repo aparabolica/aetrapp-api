@@ -9,81 +9,79 @@ module.exports = function (app) {
   const traps = sequelizeClient.define('traps', {
     // shortid https://www.npmjs.com/package/shortid
     id: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       defaultValue: shortid.generate,
       primaryKey: true
     },
 
     userOrder: {
-      type: Sequelize.INTEGER
+      type: DataTypes.INTEGER
     },
 
-    // properties
-    // timestamps
     startDate: {
-      type: Sequelize.DATE,
+      type: DataTypes.DATE,
       allowNull: false
     },
     endDate: {
-      type: Sequelize.DATE,
+      type: DataTypes.DATE,
       allowNull: false
     },
     statusCode: {
-      type: Sequelize.INTEGER
+      type: DataTypes.INTEGER
     },
     statusMessage: {
-      type: Sequelize.TEXT
+      type: DataTypes.TEXT
     },
-    daysToCollect: Sequelize.INTEGER,
+    daysToCollect: DataTypes.INTEGER,
     title: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     notes: {
-      type: Sequelize.TEXT,
+      type: DataTypes.TEXT,
     },
 
     imageId: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
 
     // location
     coordinates: {
-      type: Sequelize.GEOMETRY('POINT', 4326)
+      type: DataTypes.GEOMETRY('POINT', 4326)
     },
     addressStreet: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressNumber: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressComplement: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressNeighborhood: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressPostcode: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressCityId: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     addressStateId: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
 
     // relations
     ownerId: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
 
     // timestamps
     createdAt: {
-      type: Sequelize.DATE,
+      type: DataTypes.DATE,
       allowNull: false
     },
     updatedAt: {
-      type: Sequelize.DATE,
+      type: DataTypes.DATE,
       allowNull: false
     }
   }, {

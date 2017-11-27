@@ -2,52 +2,64 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('cardImages', {
-      // shortid https://www.npmjs.com/package/shortid
+    const DataTypes = Sequelize.DataTypes;
+    return queryInterface.createTable("cardImages", {
       id: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         primaryKey: true
       },
 
       // properties
       caption: {
-        type: Sequelize.TEXT
+        type: DataTypes.TEXT
       },
       fileUrl: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING
       },
       exifData: {
-        type: Sequelize.JSON,
+        type: DataTypes.JSON
       },
 
       // relations
       trapId: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
       },
       blobId: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
       },
 
       // analysis data
       processed: {
-        type: Sequelize.BOOLEAN
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
       },
+      error: {
+        type: DataTypes.JSON
+      },
+      analysisStartedAt: {
+        type: DataTypes.DATE
+      },
+      analysisFinishedAt: {
+        type: DataTypes.DATE
+      },
+
       processedAt: {
-        type: Sequelize.DATE
+        type: DataTypes.DATE
       },
+
       eggCount: {
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
 
       // timestamps (no updates)
       createdAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false
       },
       updatedAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false
       }
     });

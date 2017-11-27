@@ -2,53 +2,54 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('users', {
+    const DataTypes = Sequelize.DataTypes;
+    return queryInterface.createTable("users", {
       id: {
         type: Sequelize.STRING,
         primaryKey: true
       },
       password: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
       },
 
       // e-mail
       email: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true
       },
       emailIsVerified: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         defaultValue: false
       },
 
       // phone numbers
       landlineNumber: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
       cellphoneNumber: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
 
       // personal info
       name: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false
       },
       dateOfBirth: {
-        type: Sequelize.DATEONLY,
+        type: DataTypes.DATEONLY
       },
       gender: {
-        type: Sequelize.STRING
+        type: DataTypes.STRING
       },
 
       // meta
       roles: {
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: DataTypes.ARRAY(DataTypes.STRING)
       },
       isActive: {
-        type: Sequelize.BOOLEAN
+        type: DataTypes.BOOLEAN
       },
 
       // timestamp

@@ -20,41 +20,41 @@ module.exports = function (app) {
 
     // e-mail
     email: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true
     },
     emailIsVerified: {
-      type: Sequelize.BOOLEAN,
+      type: DataTypes.BOOLEAN,
       defaultValue: false
     },
 
     // phone numbers
     landlineNumber: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     cellphoneNumber: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
 
     // personal info
     name: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false
     },
     dateOfBirth: {
-      type: Sequelize.DATEONLY,
+      type: DataTypes.DATEONLY,
     },
     gender: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
 
     // meta
     roles: {
-      type: Sequelize.ARRAY(Sequelize.STRING)
+      type: DataTypes.ARRAY(DataTypes.STRING)
     },
     isActive: {
-      type: Sequelize.BOOLEAN
+      type: DataTypes.BOOLEAN
     },
 
   }, {
