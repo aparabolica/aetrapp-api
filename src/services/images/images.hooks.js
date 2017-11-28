@@ -29,7 +29,9 @@ const registerAnalysisJob = function () {
         "jobName": "process image",
         "jobSchedule": "now",
         "jobData": {
-          "imageUrl": `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`,
+          "image": {
+            "url": `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`
+          },
           "webhookUrl": `${hook.app.get("siteUrl")}/images/analysis/${hook.result.id}`
         }
     }).then(res => {
