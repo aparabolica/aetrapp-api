@@ -23,8 +23,7 @@ module.exports = function (app) {
       allowNull: false
     },
     endDate: {
-      type: DataTypes.DATE,
-      allowNull: false
+      type: DataTypes.DATE
     },
     statusCode: {
       type: DataTypes.INTEGER
