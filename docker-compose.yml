@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=aetrapp
   app:
     build: .
-    # Comment-out below for production
+    # Use npm start in production
     command: nodemon src/
     links:
       - postgres
@@ -29,6 +29,6 @@ services:
       NODE_ENV: development
       NODE_CONFIG: |-
         {
-          "siteUrl": "http://172.22.0.1:3030",
-          "ipsUrl": "http://172.23.0.1:3131"
+          "siteUrl": "http://192.168.1.32:3030",
+          "ipsUrl": "http://192.168.1.32:3131"
         }
