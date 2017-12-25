@@ -1,5 +1,8 @@
 const errors = require("feathers-errors");
 const _ = require("lodash");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op
+
 
 module.exports = (app, options) => {
   options = Object.assign(
@@ -21,29 +24,27 @@ module.exports = (app, options) => {
 
   return (req, res) => {
     const service = app.service(options.path);
-    console.log("req.body",req.body);
-    console.log("options",options);
     if (Array.isArray(req.body.ids)) {
       const ids = req.body.ids.map(id => id);
       service
         .find({
-          query: {
-            id: "{ $in: [ 'BkYyaU3ZG', 'HyGIOv3Zz', 'Bk8Ddw3-f', 'Hkh3dDhbM' ] }",
-            // {
-            //   $in: ids
-            // },
-            $select: ["id"]
-          },
-          paginate: false
-        })
-        .then(data => {
-          res.send(_.difference(ids, data.map(item => item.id)));
+          attributes: ["id"],
+          where: {
+            id: {
+              [Op.in]: ids
+            }
+          }
+        },
+        {paginate: false}
+        )
+        .then(results => {
+          res.send(_.difference(ids, results.data.map(item => item.id)));
         })
         .catch(err => {
           throw new errors.GeneralError(err);
         });
     } else {
-      throw new errors.BadRequest();
+      throw new errors.BadRequest("Parameter 'ids' must be an Array");
     }
   };
 };
