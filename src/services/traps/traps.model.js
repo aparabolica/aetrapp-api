@@ -43,9 +43,9 @@ module.exports = function (app) {
       type: DataTypes.STRING
     },
 
-    // location
     coordinates: {
-      type: DataTypes.GEOMETRY('POINT', 4326)
+      type: DataTypes.GEOMETRY('POINT', 4326),
+      allowNull: false
     },
     addressStreet: {
       type: DataTypes.STRING
