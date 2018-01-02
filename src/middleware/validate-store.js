@@ -1,7 +1,7 @@
 const errors = require("feathers-errors");
 const _ = require("lodash");
 const Sequelize = require("sequelize");
-const Op = Sequelize.Op
+const Op = Sequelize.Op;
 
 
 module.exports = (app, options) => {
@@ -35,7 +35,7 @@ module.exports = (app, options) => {
             }
           }
         },
-        {paginate: false}
+        { paginate: false }
         )
         .then(results => {
           res.send(_.difference(ids, results.data.map(item => item.id)));

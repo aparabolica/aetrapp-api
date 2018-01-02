@@ -14,6 +14,11 @@ module.exports = function (app) {
       primaryKey: true
     },
 
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+
     userOrder: {
       type: DataTypes.INTEGER
     },
