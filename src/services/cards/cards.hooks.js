@@ -22,10 +22,11 @@ const storeBlob = function () {
   }
 };
 
+// create analysis job
 const registerAnalysisJob = function () {
   return function (hook) {
     const ipsUrl = hook.app.get("ipsUrl") + '/agenda/api/jobs/create';
-    return axios.post(ipsUrl, {
+    axios.post(ipsUrl, {
         "jobName": "process image",
         "jobSchedule": "now",
         "jobData": {
@@ -35,9 +36,9 @@ const registerAnalysisJob = function () {
           "webhookUrl": `${hook.app.get("siteUrl")}/cards/analysis/${hook.result.id}`
         }
     }).then(res => {
-      return hook;
+      console.log("Analysis created successfully");
     }).catch(err => {
-      return hook;
+      console.log("err", err);
     });
   }
 };
