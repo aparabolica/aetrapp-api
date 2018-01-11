@@ -32,7 +32,7 @@ const registerAnalysisJob = function () {
           "image": {
             "url": `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`
           },
-          "webhookUrl": `${hook.app.get("siteUrl")}/images/analysis/${hook.result.id}`
+          "webhookUrl": `${hook.app.get("siteUrl")}/cards/analysis/${hook.result.id}`
         }
     }).then(res => {
       return hook;
@@ -56,16 +56,6 @@ const checkTrapId = function(){
   }
 }
 
-const assignImageToTrap = function(){
-  return function(hook){
-    hook
-      .app.service('traps')
-      .patch(hook.result.trapId, {
-        imageId: hook.result.id
-      });
-  }
-}
-
 module.exports = {
   before: {
     all: [],
@@ -81,7 +71,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [ registerAnalysisJob(), assignImageToTrap() ],
+    create: [ registerAnalysisJob() ],
     update: [],
     patch: [],
     remove: []

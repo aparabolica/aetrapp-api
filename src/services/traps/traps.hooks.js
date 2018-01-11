@@ -10,12 +10,12 @@ const restrict = [
   })
 ];
 
-const imageSchema = {
+const cardSchema = {
   schema: {
     include: {
-      service: "images",
-      nameAs: 'image',
-      parentField: 'imageId',
+      service: "cards",
+      nameAs: 'card',
+      parentField: 'cardId',
       childField: 'id'
     }
   }
@@ -64,7 +64,7 @@ module.exports = {
   },
 
   after: {
-    all: [populate(imageSchema)],
+    all: [populate(cardSchema)],
     find: [],
     get: [],
     create: [],
