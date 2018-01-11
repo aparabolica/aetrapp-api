@@ -24,10 +24,4 @@ module.exports = function () {
   const service = app.service('traps');
 
   service.hooks(hooks);
-
-  if (service.filter) {
-    service.filter(function (data, connection, hook) {
-      return data;
-    });
-  }
 };

@@ -32,10 +32,4 @@ module.exports = function () {
   });
 
   service.hooks(hooks);
-
-  if (service.filter) {
-    service.filter(function (data, connection, hook) {
-      return data;
-    });
-  }
 };

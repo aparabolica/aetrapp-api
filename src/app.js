@@ -5,13 +5,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 
-const feathers = require('feathers');
-const configuration = require('feathers-configuration');
-const hooks = require('feathers-hooks');
-const rest = require('feathers-rest');
-const socketio = require('feathers-socketio');
+const feathers = require('@feathersjs/feathers');
+const express = require('@feathersjs/express');
+const configuration = require('@feathersjs/configuration');
+const rest = require('@feathersjs/express/rest');
+const socketio = require('@feathersjs/socketio');
 
-const handler = require('feathers-errors/handler');
+const handler = require('@feathersjs/express/errors');
 const notFound = require('feathers-errors/not-found');
 
 const middleware = require('./middleware');
@@ -23,7 +23,7 @@ const uploads = require('./uploads');
 
 const sequelize = require('./sequelize');
 
-const app = feathers();
+const app = express(feathers());
 
 // Load app configuration
 app.configure(configuration());
@@ -35,11 +35,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Static folders
-app.use('/files', feathers.static(path.join(__dirname, '/../uploads')));
-app.use("/", feathers.static(path.join(__dirname, "/../dist")));
+app.use('/files', express.static(path.join(__dirname, '/../uploads')));
+app.use("/", express.static(path.join(__dirname, "/../dist")));
 
-// Set up Plugins and providers
-app.configure(hooks());
 app.configure(sequelize);
 app.configure(rest());
 app.configure(socketio({

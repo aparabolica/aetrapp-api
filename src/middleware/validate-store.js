@@ -1,4 +1,4 @@
-const errors = require("feathers-errors");
+const errors = require('@feathersjs/errors');
 const _ = require("lodash");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;

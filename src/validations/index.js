@@ -1,4 +1,4 @@
-const errors = require("feathers-errors");
+const errors = require('@feathersjs/errors');
 const Joi = require("joi");
 
 const email = Joi.string()

@@ -1,7 +1,7 @@
-const errors = require('feathers-errors');
+const errors = require('@feathersjs/errors');
 const fs = require('fs');
 const axios = require('axios');
-const { authenticate } = require("feathers-authentication").hooks;
+const { authenticate } = require('@feathersjs/authentication').hooks;
 const { restrictToOwner } = require("feathers-authentication-hooks");
 
 const restrict = [
