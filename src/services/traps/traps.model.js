@@ -19,10 +19,6 @@ module.exports = function (app) {
       defaultValue: true
     },
 
-    userOrder: {
-      type: DataTypes.INTEGER
-    },
-
     startDate: {
       type: DataTypes.DATE,
       allowNull: false

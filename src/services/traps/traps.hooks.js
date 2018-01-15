@@ -41,39 +41,12 @@ const setOwnerId = function() {
   };
 };
 
-const setUserOrder = function() {
-  return function(hook) {
-    const { ownerId } = hook.data;
-    return hook.app
-      .service("traps")
-      .find({
-        query: {
-          ownerId,
-          $sort: {
-            createdAt: -1
-          },
-          $limit: 1
-        }
-      })
-      .then(traps => {
-        if (traps.data.length)
-          hook.data.userOrder = traps.data[0].userOrder + 1;
-        else hook.data.userOrder = 1;
-        return hook;
-      })
-      .catch(err => {
-        console.log(err);
-        hook.data.userOrder = 1;
-      });
-  };
-};
-
 module.exports = {
   before: {
     all: [],
     find: [],
     get: [],
-    create: [authenticate("jwt"), setOwnerId(), setUserOrder()],
+    create: [authenticate("jwt"), setOwnerId()],
     update: [...restrict],
     patch: [...restrict],
     remove: [...restrict]
