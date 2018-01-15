@@ -38,7 +38,11 @@ module.exports = function (app) {
     },
 
     // personal info
-    name: {
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastName: {
       type: DataTypes.STRING,
       allowNull: false
     },
