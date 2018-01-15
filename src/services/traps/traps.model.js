@@ -14,6 +14,11 @@ module.exports = function (app) {
       primaryKey: true
     },
 
+    collectionWeekday: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
