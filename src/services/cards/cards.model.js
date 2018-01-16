@@ -36,6 +36,9 @@ module.exports = function (app) {
     },
 
     // analysis data
+    jobId: {
+      type: DataTypes.STRING
+    },
     processed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
