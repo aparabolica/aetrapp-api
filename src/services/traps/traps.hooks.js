@@ -17,7 +17,10 @@ const cardSchema = {
       nameAs: "allCards",
       parentField: "id",
       childField: "trapId",
-      asArray: true
+      asArray: true,
+      query: {
+        $sort: {collectedAt: -1}
+      }
     }, {
       service: "cards",
       nameAs: "eggCountSeries",
