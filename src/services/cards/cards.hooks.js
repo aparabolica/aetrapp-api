@@ -3,13 +3,16 @@ const errors = require("@feathersjs/errors");
 const fs = require("fs");
 const shortid = require("shortid");
 const { authenticate } = require("@feathersjs/authentication").hooks;
-const { restrictToOwner } = require("feathers-authentication-hooks");
+const {
+  restrictToOwner,
+  associateCurrentUser
+} = require("feathers-authentication-hooks");
 
 const restrict = [
   authenticate("jwt"),
   restrictToOwner({
     idField: "id",
-    ownerField: "id"
+    ownerField: "ownerId"
   })
 ];
 
@@ -41,12 +44,11 @@ const registerAnalysisJob = function() {
         }
       })
       .then(res => {
-        cards
-          .patch(hook.result.id, {
-            processed: false,
-            error: null,
-            jobId: jobId
-          });
+        cards.patch(hook.result.id, {
+          processed: false,
+          error: null,
+          jobId: jobId
+        });
       })
       .catch(err => {
         cards.patch(hook.result.id, {
@@ -80,7 +82,12 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [authenticate("jwt"), checkTrapId(), storeBlob()],
+    create: [
+      authenticate("jwt"),
+      checkTrapId(),
+      associateCurrentUser({ idField: "id", as: "ownerId" }),
+      storeBlob()
+    ],
     update: [...restrict],
     patch: [...restrict],
     remove: [...restrict]

@@ -34,6 +34,9 @@ module.exports = function (app) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    ownerId: {
+      type: DataTypes.STRING
+    },
 
     // analysis data
     jobId: {
