@@ -1,8 +1,7 @@
-const errors = require('@feathersjs/errors');
+const errors = require("@feathersjs/errors");
 const _ = require("lodash");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-
 
 module.exports = (app, options) => {
   options = Object.assign(
@@ -28,17 +27,14 @@ module.exports = (app, options) => {
       const ids = req.body.ids.map(id => id);
       service
         .find({
-          attributes: ["id"],
-          where: {
-            id: {
-              [Op.in]: ids
-            }
+          paginate: false,
+          query: {
+            $select: ["id"],
+            id: ids
           }
-        },
-        { paginate: false }
-        )
+        })
         .then(results => {
-          res.send(_.difference(ids, results.data.map(item => item.id)));
+          res.send(_.difference(ids, results.map(item => item.id)));
         })
         .catch(err => {
           throw new errors.GeneralError(err);
