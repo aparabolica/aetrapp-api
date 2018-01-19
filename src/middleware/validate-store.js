@@ -1,7 +1,5 @@
 const errors = require("@feathersjs/errors");
 const _ = require("lodash");
-const Sequelize = require("sequelize");
-const Op = Sequelize.Op;
 
 module.exports = (app, options) => {
   options = Object.assign(

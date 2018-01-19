@@ -4,6 +4,8 @@ const {
   associateCurrentUser
 } = require("feathers-authentication-hooks");
 const { populate } = require("feathers-hooks-common");
+const parseDateQuery = require("../../hooks/parse-date-query");
+
 
 const restrict = [
   authenticate("jwt"),
@@ -46,7 +48,10 @@ const cardSchema = {
 module.exports = {
   before: {
     all: [],
-    find: [],
+    find: [
+      parseDateQuery("createdAt"),
+      parseDateQuery("updatedAt")
+    ],
     get: [],
     create: [
       authenticate("jwt"),

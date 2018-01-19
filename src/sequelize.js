@@ -8,8 +8,7 @@ module.exports = function () {
     logging: false,
     define: {
       freezeTableName: true
-    },
-    operatorsAliases: false
+    }
   });
   const oldSetup = app.setup;
 
