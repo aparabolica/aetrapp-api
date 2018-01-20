@@ -14,7 +14,6 @@ module.exports = (property) => {
   return hook => {
     const { query } = hook.params;
     if(query !== undefined) {
-      console.log("parsing query", query);
       _parse(query);
       if(query['$or']) {
         query['$or'] = query['$or'].map(_parse);
