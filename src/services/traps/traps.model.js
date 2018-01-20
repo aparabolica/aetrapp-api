@@ -24,13 +24,6 @@ module.exports = function (app) {
       defaultValue: true
     },
 
-    startDate: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    endDate: {
-      type: DataTypes.DATE
-    },
     statusCode: {
       type: DataTypes.INTEGER
     },
