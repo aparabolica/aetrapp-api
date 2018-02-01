@@ -41,5 +41,12 @@ module.exports = function (app) {
       }
     });
 
+  cities.associate = function (models) { // eslint-disable-line no-unused-vars
+    cities.belongsToMany(models.users, {
+      as: 'maintainers',
+      through: 'citiesMaintainers'
+    });
+  };
+
   return cities;
 };

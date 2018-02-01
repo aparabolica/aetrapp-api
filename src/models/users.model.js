@@ -53,7 +53,6 @@ module.exports = function (app) {
       type: DataTypes.STRING
     },
 
-    // meta
     roles: {
       type: DataTypes.ARRAY(DataTypes.STRING)
     },
@@ -70,9 +69,9 @@ module.exports = function (app) {
   });
 
   users.associate = function (models) { // eslint-disable-line no-unused-vars
-    // Define associations here
-    // See http://docs.sequelizejs.com/en/latest/docs/associations/
+    users.belongsToMany(models.cities, {
+      through: 'citiesMaintainers'
+    });
   };
-
   return users;
 };
