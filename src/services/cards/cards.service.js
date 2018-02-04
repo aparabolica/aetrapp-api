@@ -1,7 +1,8 @@
 // Initializes the `cards` service on path `/cards`
 const createService = require("feathers-sequelize");
-const createModel = require("./cards.model");
+const createModel = require("../../models/cards.model");
 const hooks = require("./cards.hooks");
+const validateStore = require("../../middleware/validate-store");
 
 module.exports = function() {
   const app = this;
@@ -13,6 +14,8 @@ module.exports = function() {
     Model,
     paginate
   };
+
+  app.use("/cards/validate_store", validateStore(app, { path: "cards" }));
 
   // Initialize our service with any options it requires
   app.use("/cards", createService(options));
