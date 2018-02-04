@@ -1,6 +1,6 @@
 // Initializes the `traps` service on path `/traps`
 const createService = require('feathers-sequelize');
-const createModel = require('./traps.model');
+const createModel = require('../../models/traps.model');
 const hooks = require('./traps.hooks');
 const validateStore = require("../../middleware/validate-store");
 

@@ -20,11 +20,11 @@ const cardSchema = {
     include: [
       {
         service: "cards",
-        nameAs: "allCards",
         parentField: "id",
         childField: "trapId",
         asArray: true,
         query: {
+          $select: ["id"],
           $sort: { collectedAt: -1 }
         }
       },
@@ -37,7 +37,7 @@ const cardSchema = {
           processed: true,
           error: null,
           $select: ["id", "eggCount", "collectedAt"],
-          $sort: { createdAt: 1 }
+          $sort: { collectedAt: 1 }
         },
         asArray: true
       }
