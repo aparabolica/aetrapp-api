@@ -45,17 +45,17 @@ const registerAnalysisJob = function() {
       })
       .then(res => {
         cards.patch(hook.result.id, {
-          processed: false,
+          status: "analysing",
           error: null,
           jobId: jobId
         });
       })
       .catch(err => {
         cards.patch(hook.result.id, {
-          processed: true,
+          status: "invalid",
           error: {
             code: "500",
-            message: "Erro ao criar processo de análise."
+            message: "Erro no servidor de análise."
           }
         });
       });

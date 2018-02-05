@@ -4,7 +4,7 @@ const createModel = require("../../models/cards.model");
 const hooks = require("./cards.hooks");
 const validateStore = require("../../middleware/validate-store");
 
-module.exports = function() {
+module.exports = function () {
   const app = this;
   const Model = createModel(app);
   const paginate = app.get("paginate");
@@ -24,22 +24,8 @@ module.exports = function() {
   const service = app.service("cards");
 
   app.use("/cards/analysis/:id", (req, res) => {
-    const { results } = req.body;
     service
-      .patch(
-        null,
-        Object.assign(
-          {
-            processed: true
-          },
-          results
-        ),
-        {
-          query: {
-            jobId: req.params.id
-          }
-        }
-      )
+      .patch(null, { ...req.body.results }, { query: { jobId: req.params.id } })
       .then(() => {
         res.send("ok");
       })

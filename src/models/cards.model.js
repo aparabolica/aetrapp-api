@@ -39,6 +39,10 @@ module.exports = function (app) {
     },
 
     // analysis data
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'unprocessed'
+    },
     jobId: {
       type: DataTypes.STRING
     },
