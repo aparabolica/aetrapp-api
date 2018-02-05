@@ -15,11 +15,11 @@ const restrict = [
   })
 ];
 
-const cardSchema = {
+const sampleSchema = {
   schema: {
     include: [
       {
-        service: "cards",
+        service: "samples",
         parentField: "id",
         childField: "trapId",
         asArray: true,
@@ -29,7 +29,7 @@ const cardSchema = {
         }
       },
       {
-        service: "cards",
+        service: "samples",
         nameAs: "eggCountSeries",
         parentField: "id",
         childField: "trapId",
@@ -63,7 +63,7 @@ module.exports = {
   },
 
   after: {
-    all: [populate(cardSchema)],
+    all: [populate(sampleSchema)],
     find: [],
     get: [],
     create: [],

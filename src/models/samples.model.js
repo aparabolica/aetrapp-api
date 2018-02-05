@@ -6,7 +6,7 @@ const shortid = require('shortid');
 
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
-  const cards = sequelizeClient.define('cards', {
+  const samples = sequelizeClient.define('samples', {
     // shortid https://www.npmjs.com/package/shortid
     id: {
       type: DataTypes.STRING,
@@ -90,10 +90,10 @@ module.exports = function (app) {
     }
   });
 
-  cards.associate = function (models) { // eslint-disable-line no-unused-vars
+  samples.associate = function (models) { // eslint-disable-line no-unused-vars
     // Define associations here
     // See http://docs.sequelizejs.com/en/latest/docs/associations/
   };
 
-  return cards;
+  return samples;
 };

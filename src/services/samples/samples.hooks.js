@@ -30,7 +30,7 @@ const storeBlob = function() {
 const registerAnalysisJob = function() {
   return function(hook) {
     const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
-    const cards = hook.app.service("cards");
+    const samples = hook.app.service("samples");
     const jobId = shortid.generate();
     axios
       .post(ipsUrl, {
@@ -40,18 +40,18 @@ const registerAnalysisJob = function() {
           image: {
             url: `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`
           },
-          webhookUrl: `${hook.app.get("siteUrl")}/cards/analysis/${jobId}`
+          webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
         }
       })
       .then(res => {
-        cards.patch(hook.result.id, {
+        samples.patch(hook.result.id, {
           status: "analysing",
           error: null,
           jobId: jobId
         });
       })
       .catch(err => {
-        cards.patch(hook.result.id, {
+        samples.patch(hook.result.id, {
           status: "invalid",
           error: {
             code: "500",

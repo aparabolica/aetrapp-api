@@ -1,7 +1,7 @@
-// Initializes the `cards` service on path `/cards`
+// Initializes the `samples` service on path `/samples`
 const createService = require("feathers-sequelize");
-const createModel = require("../../models/cards.model");
-const hooks = require("./cards.hooks");
+const createModel = require("../../models/samples.model");
+const hooks = require("./samples.hooks");
 const validateStore = require("../../middleware/validate-store");
 
 module.exports = function () {
@@ -10,20 +10,20 @@ module.exports = function () {
   const paginate = app.get("paginate");
 
   const options = {
-    name: "cards",
+    name: "samples",
     Model,
     paginate
   };
 
-  app.use("/cards/validate_store", validateStore(app, { path: "cards" }));
+  app.use("/samples/validate_store", validateStore(app, { path: "samples" }));
 
   // Initialize our service with any options it requires
-  app.use("/cards", createService(options));
+  app.use("/samples", createService(options));
 
   // Get our initialized service so that we can register hooks and filters
-  const service = app.service("cards");
+  const service = app.service("samples");
 
-  app.use("/cards/analysis/:id", (req, res) => {
+  app.use("/samples/analysis/:id", (req, res) => {
     service
       .patch(null, { ...req.body.results }, { query: { jobId: req.params.id } })
       .then(() => {
