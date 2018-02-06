@@ -7,6 +7,10 @@ const {
   restrictToOwner,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
+const {
+  iff
+} = require("feathers-hooks-common");
+
 
 const restrict = [
   authenticate("jwt"),
@@ -16,8 +20,8 @@ const restrict = [
   })
 ];
 
-const storeBlob = function() {
-  return function(hook) {
+const storeBlob = function () {
+  return function (hook) {
     const blobService = hook.app.service("uploads");
     return blobService.create({ uri: hook.data.base64 }).then(res => {
       hook.data.blobId = res.id;
@@ -27,8 +31,8 @@ const storeBlob = function() {
 };
 
 // create analysis job
-const registerAnalysisJob = function() {
-  return function(hook) {
+const registerAnalysisJob = function () {
+  return function (hook) {
     const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
     const samples = hook.app.service("samples");
     const jobId = shortid.generate();
@@ -55,15 +59,15 @@ const registerAnalysisJob = function() {
           status: "invalid",
           error: {
             code: "500",
-            message: "Erro no servidor de análise."
+            message: "Erro no serviço de análise."
           }
         });
       });
   };
 };
 
-const checkTrapId = function() {
-  return function(hook) {
+const checkTrapId = function () {
+  return function (hook) {
     hook.app
       .service("traps")
       .get(hook.data.trapId)
@@ -77,6 +81,55 @@ const checkTrapId = function() {
   };
 };
 
+const loadSample = function () {
+  return function (hook) {
+    return hook.app
+      .service("samples")
+      .get(hook.id)
+      .then(sample => {
+        if (sample) {
+          hook.sample = sample;
+          return hook;
+        }
+        else new errors.BadRequest("Could not find sample.");
+      })
+      .catch(err => {
+        return new errors.GeneralError("Internal error.");
+      });
+  };
+};
+
+const startAnalysis = function () {
+  return function (hook) {
+    return registerAnalysis(hook)
+      .then(res => {
+        return hook;
+      })
+      .catch(err => {
+        return new errors.GeneralError("Analysis service error.");
+      })
+  }
+}
+
+const registerAnalysis = function (hook) {
+  const sample = hook.sample || hook.result;
+  const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
+  const samples = hook.app.service("samples");
+  const jobId = shortid.generate();
+  if (hook.method == "patch") hook.data.jobId = jobId;
+  return axios
+    .post(ipsUrl, {
+      jobName: "process image",
+      jobSchedule: "now",
+      jobData: {
+        image: {
+          url: `${hook.app.get("siteUrl")}/files/${sample.blobId}`
+        },
+        webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
+      }
+    })
+}
+
 module.exports = {
   before: {
     all: [],
@@ -89,7 +142,14 @@ module.exports = {
       storeBlob()
     ],
     update: [...restrict],
-    patch: [...restrict],
+    patch: [
+      ...restrict,
+      iff(
+        hook => { return hook.data && hook.data.status == "analysing" },
+        loadSample(),
+        startAnalysis()
+      )
+    ],
     remove: [...restrict]
   },
 
