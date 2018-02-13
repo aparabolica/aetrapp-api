@@ -3,7 +3,7 @@ const {
   restrictToOwner,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
-const { populate } = require("feathers-hooks-common");
+const { iff, populate } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 
 
@@ -27,6 +27,12 @@ const sampleSchema = {
           $select: ["id"],
           $sort: { collectedAt: -1 }
         }
+      },
+      {
+        service: "cities",
+        nameAs: "city",
+        parentField: "addressCityId",
+        childField: "id"
       },
       {
         service: "samples",
