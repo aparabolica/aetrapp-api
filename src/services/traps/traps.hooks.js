@@ -45,6 +45,22 @@ const sampleSchema = {
   }
 };
 
+const deactivateActiveTrap = function () {
+  return function (hook) {
+    return hook.app
+      .service("traps")
+      .patch(null, { isActive: false }, {
+        query: {
+          ownerId: hook.params.user.id,
+          isActive: true
+        }
+      })
+      .catch(err => {
+        return new errors.GeneralError("Internal error.");
+      });
+  };
+};
+
 module.exports = {
   before: {
     all: [],
@@ -58,7 +74,13 @@ module.exports = {
       associateCurrentUser({ idField: "id", as: "ownerId" })
     ],
     update: [...restrict],
-    patch: [...restrict],
+    patch: [
+      ...restrict,
+      iff(
+        hook => { return hook.data && hook.data.isActive },
+        deactivateActiveTrap()
+      )
+    ],
     remove: [...restrict]
   },
 
