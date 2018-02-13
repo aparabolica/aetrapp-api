@@ -61,6 +61,9 @@ const deactivateActiveTrap = function () {
           isActive: true
         }
       })
+      .then(res=>{
+        return hook;
+      })
       .catch(err => {
         return new errors.GeneralError("Internal error.");
       });
