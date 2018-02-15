@@ -23,7 +23,8 @@ module.exports = function (app) {
     statusMessage: {
       type: DataTypes.TEXT
     },
-    daysToCollect: DataTypes.INTEGER,
+
+    cycleDuration: DataTypes.FLOAT, // in days
 
     imageId: {
       type: DataTypes.STRING
