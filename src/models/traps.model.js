@@ -1,5 +1,3 @@
-// See http://docs.sequelizejs.com/en/latest/docs/models-definition/
-// for more of what you can do here.
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const shortid = require('shortid');
@@ -7,16 +5,10 @@ const shortid = require('shortid');
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
   const traps = sequelizeClient.define('traps', {
-    // shortid https://www.npmjs.com/package/shortid
     id: {
       type: DataTypes.STRING,
       defaultValue: shortid.generate,
       primaryKey: true
-    },
-
-    collectionWeekday: {
-      type: DataTypes.INTEGER,
-      allowNull: false
     },
 
     isActive: {
@@ -27,16 +19,11 @@ module.exports = function (app) {
     statusCode: {
       type: DataTypes.INTEGER
     },
+
     statusMessage: {
       type: DataTypes.TEXT
     },
     daysToCollect: DataTypes.INTEGER,
-    title: {
-      type: DataTypes.STRING
-    },
-    notes: {
-      type: DataTypes.TEXT,
-    },
 
     imageId: {
       type: DataTypes.STRING

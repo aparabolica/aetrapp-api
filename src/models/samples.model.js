@@ -1,5 +1,3 @@
-// See http://docs.sequelizejs.com/en/latest/docs/models-definition/
-// for more of what you can do here.
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const shortid = require('shortid');
@@ -7,7 +5,6 @@ const shortid = require('shortid');
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
   const samples = sequelizeClient.define('samples', {
-    // shortid https://www.npmjs.com/package/shortid
     id: {
       type: DataTypes.STRING,
       defaultValue: shortid.generate,
