@@ -40,8 +40,7 @@ const sampleSchema = {
         parentField: "id",
         childField: "trapId",
         query: {
-          processed: true,
-          error: null,
+          status: "valid",
           $select: ["id", "eggCount", "collectedAt"],
           $sort: { collectedAt: 1 }
         },
@@ -61,7 +60,7 @@ const deactivateActiveTrap = function () {
           isActive: true
         }
       })
-      .then(res=>{
+      .then(res => {
         return hook;
       })
       .catch(err => {

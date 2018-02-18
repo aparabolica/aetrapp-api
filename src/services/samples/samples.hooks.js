@@ -55,11 +55,13 @@ const registerAnalysisJob = function () {
         });
       })
       .catch(err => {
+        let errorMessage = "Erro ao solicitar serviço de análise."
+        if (err.code == "ECONNREFUSED") errorMessage = "Serviço de análise não está disponível";
         samples.patch(hook.result.id, {
-          status: "invalid",
+          status: "unprocessed",
           error: {
             code: "500",
-            message: "Erro no serviço de análise."
+            message: errorMessage
           }
         });
       });
@@ -106,7 +108,7 @@ const startAnalysis = function () {
         return hook;
       })
       .catch(err => {
-        return new errors.GeneralError("Analysis service error.");
+        return new errors.GeneralError(err.message);
       })
   }
 }
@@ -127,6 +129,12 @@ const registerAnalysis = function (hook) {
         },
         webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
       }
+    })
+    .then(res=>{
+      return hook;
+    })
+    .catch(err=>{
+      return new errors.InternalError(err.message);
     })
 }
 
