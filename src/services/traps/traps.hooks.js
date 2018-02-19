@@ -1,6 +1,6 @@
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const {
-  restrictToOwner,
+  restrictToRoles,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
 const { iff, populate } = require("feathers-hooks-common");
@@ -9,9 +9,11 @@ const parseDateQuery = require("../../hooks/parse-date-query");
 
 const restrict = [
   authenticate("jwt"),
-  restrictToOwner({
+  restrictToRoles({
+    roles: ['admin'],
     idField: "id",
-    ownerField: "ownerId"
+    ownerField: "ownerId",
+    owner: true
   })
 ];
 

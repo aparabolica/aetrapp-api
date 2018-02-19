@@ -5,7 +5,7 @@ const fs = require("fs");
 const shortid = require("shortid");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const {
-  restrictToOwner,
+  restrictToRoles,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
 const {
@@ -15,9 +15,11 @@ const {
 
 const restrict = [
   authenticate("jwt"),
-  restrictToOwner({
+  restrictToRoles({
+    roles: ['admin'],
     idField: "id",
-    ownerField: "ownerId"
+    ownerField: "ownerId",
+    owner: true
   })
 ];
 
