@@ -7,6 +7,7 @@ module.exports = {
       authenticate("jwt"),
       restrictToRoles({
         roles: ['admin'],
+        idField: "id",
         owner: false
       })
     ],
