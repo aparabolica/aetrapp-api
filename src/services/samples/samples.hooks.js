@@ -1,4 +1,5 @@
 const axios = require("axios");
+const Sequelize = require("sequelize");
 const errors = require("@feathersjs/errors");
 const fs = require("fs");
 const shortid = require("shortid");
@@ -130,12 +131,42 @@ const registerAnalysis = function (hook) {
         webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
       }
     })
-    .then(res=>{
+    .then(res => {
       return hook;
     })
-    .catch(err=>{
+    .catch(err => {
       return new errors.InternalError(err.message);
     })
+}
+
+const removeSameDayDuplicates = function (hook) {
+  return function (hook) {
+    const Op = Sequelize.Op;
+    const samples = hook.app.service("samples");
+    const sample = hook.sample || hook.result;
+
+    return samples.find({
+      query: {
+        id: { [Op.ne]: sample.id },
+        trapId: sample.trapId,
+        createdAt: {
+          [Op.lt]: new Date(),
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000)
+        }
+      }
+    }).then(results => {
+
+      // Remove found samples
+      Promise.all(results.data.map(sample => {
+        return samples.remove(sample.id);
+      })).then(() => {
+        return hook;
+      });
+
+    }).catch(err => {
+      return new errors.GeneralError("Internal error.");
+    });
+  };
 }
 
 module.exports = {
@@ -165,7 +196,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [registerAnalysisJob()],
+    create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
     patch: [],
     remove: []
