@@ -19,6 +19,9 @@ module.exports = function (app) {
     templateId: {
       type: DataTypes.STRING
     },
+    senderId: {
+      type: DataTypes.STRING
+    },
     data: {
       type: DataTypes.JSON
     },
