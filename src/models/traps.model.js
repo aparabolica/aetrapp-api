@@ -24,7 +24,10 @@ module.exports = function (app) {
       type: DataTypes.TEXT
     },
 
-    cycleDuration: DataTypes.FLOAT, // in days
+    cycleDuration: { // in days
+      type: DataTypes.FLOAT,
+      defaultValue: 2
+    },
 
     imageId: {
       type: DataTypes.STRING
@@ -69,14 +72,18 @@ module.exports = function (app) {
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false
-    }
+    },
+    cycleStart: {
+      type: DataTypes.DATE,
+      defaultValue: Date.now
+    },
   }, {
-    hooks: {
-      beforeCount(options) {
-        options.raw = true;
+      hooks: {
+        beforeCount(options) {
+          options.raw = true;
+        }
       }
-    }
-  });
+    });
 
   traps.associate = function (models) { // eslint-disable-line no-unused-vars
     // Define associations here
