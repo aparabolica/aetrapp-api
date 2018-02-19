@@ -184,7 +184,7 @@ module.exports = {
     patch: [
       ...restrict,
       iff(
-        hook => { return hook.data && hook.data.status == "analysing" },
+        hook => { return hook.data && hook.data.status == "analysing" && !hook.data.jobId },
         loadSample(),
         startAnalysis()
       )
