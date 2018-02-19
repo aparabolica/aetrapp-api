@@ -9,13 +9,15 @@ var {
   when
 } = common;
 
-const { restrictToOwner } = require("feathers-authentication-hooks");
+const { restrictToRoles } = require("feathers-authentication-hooks");
 const { hashPassword } = require('@feathersjs/authentication-local').hooks;
 const restrict = [
   authenticate("jwt"),
-  restrictToOwner({
+  restrictToRoles({
+    roles: ['admin'],
     idField: "id",
-    ownerField: "id"
+    ownerField: "id",
+    owner: true
   })
 ];
 
