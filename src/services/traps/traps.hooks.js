@@ -1,20 +1,56 @@
 const { authenticate } = require("@feathersjs/authentication").hooks;
-const {
-  restrictToRoles,
-  associateCurrentUser
-} = require("feathers-authentication-hooks");
+const { associateCurrentUser } = require("feathers-authentication-hooks");
 const { iff, populate } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
+const errors = require("@feathersjs/errors");
+
+const loadTrap = function () {
+  return function (hook) {
+    return hook.app
+      .service("traps")
+      .get(hook.id)
+      .then(trap => {
+        if (trap) {
+          hook.trap = trap;
+          return hook;
+        }
+        else new errors.BadRequest("Could not find trap.");
+      })
+      .catch(err => {
+        return new errors.GeneralError("Internal error.");
+      });
+  };
+};
 
 
 const restrict = [
   authenticate("jwt"),
-  restrictToRoles({
-    roles: ['admin'],
-    idField: "id",
-    ownerField: "ownerId",
-    owner: true
-  })
+  loadTrap(),
+  function (hook) {
+    const { trap } = hook;
+    const { id, roles } = hook.params.user;
+
+    // user is the owner?
+    if (trap.ownerId == id) return hook;
+
+    // user is admin?
+    if (roles.includes['admin']) return hook;
+
+    // user is a city moderator?
+    if (!roles.includes['moderator']) throw new errors.Forbidden("User is not allowed to change this trap.");
+    else
+      return hook.app.get("sequelizeClient")
+        .users
+        .findById(id)
+        .then(function (user) {
+          return user.hasCity(trap.addressCityId).then(result => {
+            if (result)
+              return hook;
+            else
+              throw new errors.Forbidden("User is not allowed to change this trap.");
+          });
+        })
+  },
 ];
 
 const sampleSchema = {
