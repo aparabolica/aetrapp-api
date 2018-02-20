@@ -107,6 +107,16 @@ const deactivateActiveTrap = function () {
   };
 };
 
+const storeBlob = function () {
+  return function (hook) {
+    const blobService = hook.app.service("uploads");
+    return blobService.create({ uri: hook.data.base64 }).then(res => {
+      hook.data.imageId = res.id;
+      return hook;
+    });
+  };
+};
+
 module.exports = {
   before: {
     all: [],
@@ -117,7 +127,8 @@ module.exports = {
     get: [],
     create: [
       authenticate("jwt"),
-      associateCurrentUser({ idField: "id", as: "ownerId" })
+      associateCurrentUser({ idField: "id", as: "ownerId" }),
+      storeBlob()
     ],
     update: [...restrict],
     patch: [
