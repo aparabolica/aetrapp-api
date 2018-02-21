@@ -51,7 +51,8 @@ module.exports = function (app) {
     },
 
     roles: {
-      type: DataTypes.ARRAY(DataTypes.STRING)
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: []
     },
     isActive: {
       type: DataTypes.BOOLEAN
