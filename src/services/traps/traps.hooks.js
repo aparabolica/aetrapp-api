@@ -1,6 +1,6 @@
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { iff, populate } = require("feathers-hooks-common");
+const { iff, isProvider, populate } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
 
@@ -24,33 +24,35 @@ const loadTrap = function () {
 
 
 const restrict = [
-  authenticate("jwt"),
-  loadTrap(),
-  function (hook) {
-    const { trap } = hook;
-    const { id, roles } = hook.params.user;
+  iff(isProvider('external'), [
+    authenticate("jwt"),
+    loadTrap(),
+    function (hook) {
+      const { trap } = hook;
+      const { id, roles } = hook.params.user;
 
-    // user is the owner?
-    if (trap.ownerId == id) return hook;
+      // user is the owner?
+      if (trap.ownerId == id) return hook;
 
-    // user is admin?
-    if (roles.includes['admin']) return hook;
+      // user is admin?
+      if (roles.includes['admin']) return hook;
 
-    // user is a city moderator?
-    if (!roles.includes['moderator']) throw new errors.Forbidden("User is not allowed to change this trap.");
-    else
-      return hook.app.get("sequelizeClient")
-        .users
-        .findById(id)
-        .then(function (user) {
-          return user.hasCity(trap.addressCityId).then(result => {
-            if (result)
-              return hook;
-            else
-              throw new errors.Forbidden("User is not allowed to change this trap.");
-          });
-        })
-  },
+      // user is a city moderator?
+      if (!roles.includes['moderator']) throw new errors.Forbidden("User is not allowed to change this trap.");
+      else
+        return hook.app.get("sequelizeClient")
+          .users
+          .findById(id)
+          .then(function (user) {
+            return user.hasCity(trap.addressCityId).then(result => {
+              if (result)
+                return hook;
+              else
+                throw new errors.Forbidden("User is not allowed to change this trap.");
+            });
+          })
+    }
+  ])
 ];
 
 const sampleSchema = {
@@ -134,7 +136,9 @@ module.exports = {
     patch: [
       ...restrict,
       iff(
-        hook => { return hook.data && hook.data.isActive },
+        hook => {
+          return hook.data && hook.data.isActive
+        },
         deactivateActiveTrap()
       )
     ],
