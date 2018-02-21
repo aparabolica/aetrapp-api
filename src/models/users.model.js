@@ -15,15 +15,19 @@ module.exports = function (app) {
       allowNull: false
     },
 
+    // E-mail verification & reset
+    isVerified: { type: DataTypes.BOOLEAN, defaultValue: false },
+    verifyToken: { type: DataTypes.STRING },
+    verifyExpires: { type: DataTypes.DATE },
+    verifyChanges: { type: DataTypes.JSON },
+    resetToken: { type: DataTypes.STRING },
+    resetExpires: { type: DataTypes.DATE },
+
     // e-mail
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true
-    },
-    emailIsVerified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
     },
 
     // phone numbers
