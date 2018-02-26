@@ -1,8 +1,13 @@
+const _ = require("lodash");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { iff, isProvider, populate } = require("feathers-hooks-common");
+const { getItems, iff, isProvider, populate } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
+
+// Localized moment.js
+const moment = require("moment/min/moment-with-locales");
+moment.locale("pt-br");
 
 const loadTrap = function () {
   return function (hook) {
@@ -119,6 +124,60 @@ const storeBlob = function () {
   };
 };
 
+const notifyCollectWindow = function () {
+  return function (hook) {
+    const trap = _.castArray(getItems(hook))[0];
+    trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days');
+
+    // trap was created notification
+    hook.app
+      .service("notifications")
+      .create({
+        recipientId: trap.ownerId,
+        type: 'direct',
+        title: "Armadilha criada",
+        message: "Você deverá remover o cartão no endereço " +trap.addressStreet+ " em "
+          + moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').fromNow()
+      })
+      .catch(err => {
+        console.log('Error creating notification');
+        console.log(err);
+      });
+
+    // sample window is near notification
+    hook.app
+      .service("notifications")
+      .create({
+        recipientId: trap.ownerId,
+        type: 'direct',
+        data: { trapId: trap.id },
+        title: "Coleta amanhã",
+        deliveryTime: moment(trap.cycleStart).add(trap.cycleDuration - 2, 'days').toDate(),
+        message: "A coleta da amostra deverá ser feita amanhã"
+      })
+      .catch(err => {
+        console.log('Error creating notification');
+        console.log(err);
+      });
+
+    // sample window is near notification
+    hook.app
+      .service("notifications")
+      .create({
+        recipientId: trap.ownerId,
+        type: 'direct',
+        data: { trapId: trap.id },
+        title: "Coleta hoje:",
+        deliveryTime: moment(trap.cycleStart).add(10, 'days').toDate(),
+        message: "Retire o cartão de amostra da armadilha"
+      })
+      .catch(err => {
+        console.log('Error creating notification');
+        console.log(err);
+      });
+  }
+}
+
 module.exports = {
   before: {
     all: [],
@@ -149,7 +208,7 @@ module.exports = {
     all: [populate(sampleSchema)],
     find: [],
     get: [],
-    create: [],
+    create: [notifyCollectWindow()],
     update: [],
     patch: [],
     remove: []
