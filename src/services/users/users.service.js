@@ -74,8 +74,6 @@ module.exports = function () {
                 else
                   reject(new errors.NotFound(`Dissociation failed, does it exist?`));
               }).catch(err => {
-                console.log('er r');
-                console.log(err);
                 reject(new errors.GeneralError("Could not associate maintainer to city."))
               });
             })

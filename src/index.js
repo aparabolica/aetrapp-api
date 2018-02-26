@@ -1,4 +1,12 @@
 /* eslint-disable no-console */
+
+/*
+   Set appRoot as a global variable. Reference:
+   https://stackoverflow.com/questions/10265798/determine-project-root-from-a-running-node-js-application
+*/
+var path = require('path');
+global.appRoot = path.resolve(__dirname);
+
 const logger = require('winston');
 const app = require('./app');
 const port = app.get('port');

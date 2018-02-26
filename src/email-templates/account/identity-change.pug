@@ -1,0 +1,16 @@
+html
+  body(style='margin: 0;font-family: Clan Pro Narrow;font-size: 1.2em;')
+    header.text-center(style='padding: 1em;background-color: #464646;margin-bottom: 1em;text-align: center;')
+      .logo(style='max-width: 33.33%;')
+        img(src=logo)
+    .body(style='padding: 1em;margin-right: auto;margin-left: auto;max-width: 500px;color: #000;')
+      h1(style='font-family: Clan Pro Narrow;font-size: 1.5em;') Olá, #{name}
+      p Suas informações de usuário foram alteradas recentemente. Por favor, confirme que as modificações foram feitas por você.
+      ul
+        each change, key in changes
+          li #{key}: #{change}
+      a.reset-btn(href=hashLink, style='color: #6dbc44;display: block;text-align: center;text-decoration: none;padding: 0.5em;font-size: 1.2em;border: 5px solid #6dbc44;border-radius: 3px;margin: 1em;margin-right: auto;margin-left: auto;') Aceito as modificações
+      p.text-small(style='color: grey;font-size: 0.9em;text-align: center;margin-bottom: 0;margin-top: 2em;') Se você não pediu para receber este e-mail, por favor,
+      p.text-small(style="text-align: center;")
+        a(href='mailto:' + returnEmail + '?subject=I did not change my email&body=Someone unauthorized changed my email. Can you help me change it back?')  fale com a gente.
+
