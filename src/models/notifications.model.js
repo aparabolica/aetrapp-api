@@ -16,10 +16,13 @@ module.exports = function (app) {
     message: {
       type: DataTypes.TEXT
     },
-    templateId: {
+    type: {
       type: DataTypes.STRING
     },
     senderId: {
+      type: DataTypes.STRING
+    },
+    recipientId: {
       type: DataTypes.STRING
     },
     data: {
@@ -31,11 +34,12 @@ module.exports = function (app) {
     excludeSegments: {
       type: DataTypes.ARRAY(DataTypes.STRING)
     },
-    locations: {
-      type: DataTypes.JSON
+    recipientCities: {
+      type: DataTypes.ARRAY(DataTypes.STRING)
     },
     deliveryTime: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      defaultValue: Date.now
     }
   }, {
       hooks: {
