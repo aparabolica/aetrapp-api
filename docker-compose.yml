@@ -34,6 +34,14 @@ services:
       NODE_ENV: development
       NODE_CONFIG: |-
         {
-          "siteUrl": "http://192.168.1.32:3030",
-          "ipsUrl": "http://192.168.1.32:3131"
+          "webappUrl": "http://localhost:8000",
+          "apiUrl": "http://localhost:3030",
+          "ipsUrl": "http://localhost:3131",
+          "supportEmail": "suporte@aetrapp.org",
+          "mailgun": {
+            "api_key": "<mailgunApiKey>",
+            "api_key": "mailgun api key",
+            "domain": "mg.aetrapp.org",
+            "senderEmail": "Mensageiro do Aetrapp naoresponda@aetrapp.org"
+          }
         }
