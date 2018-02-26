@@ -12,6 +12,8 @@ const {
   iff
 } = require("feathers-hooks-common");
 
+const config = require('config');
+const apiUrl = config.get('apiUrl');
 
 const restrict = [
   authenticate("jwt"),
@@ -45,9 +47,9 @@ const registerAnalysisJob = function () {
         jobSchedule: "now",
         jobData: {
           image: {
-            url: `${hook.app.get("siteUrl")}/files/${hook.result.blobId}`
+            url: `${apiUrl}/files/${hook.result.blobId}`
           },
-          webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
+          webhookUrl: `${apiUrl}/samples/analysis/${jobId}`
         }
       })
       .then(res => {
