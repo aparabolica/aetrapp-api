@@ -7,7 +7,22 @@ module.exports = function () {
   const sequelizeClient = app.get('sequelizeClient');
 
   app.get("/downloads/traps.csv", function (req, res) {
-    var results = [['id', 'createdAt']];
+    var results = [[
+      'id',
+      'lon',
+      'lat',
+      'addressStreet',
+      'addressComplement',
+      'addressNeighborhood',
+      'addressPostcode',
+      'addressCityId',
+      'addressStateId',
+      'createdAt',
+      'updatedAt',
+      'isActive',
+      'cycleDuration',
+      'cycleStart'
+    ]];
     var query = "SELECT * FROM traps ORDER BY \"createdAt\" ASC";
     sequelizeClient.query(query)
       .then(function (queryResult) {
@@ -15,7 +30,19 @@ module.exports = function () {
           var time = moment(item.createdAt);
           results.push([
             item.id,
-            time.tz("Brazil/East").format()
+            item.coordinates.coordinates[0],
+            item.coordinates.coordinates[1],
+            item.addressStreet,
+            item.addressComplement,
+            item.addressNeighborhood,
+            item.addressPostcode,
+            item.addressCityId,
+            item.addressStateId,
+            moment(item.createdAt).tz("Brazil/East").format(),
+            moment(item.updatedAt).tz("Brazil/East").format(),
+            item.isActive ? 1 : 0,
+            item.cycleDuration,
+            moment(item.cycleStart).tz("Brazil/East").format()
           ]);
         });
         csvStringify(results, function (err, csv) {
