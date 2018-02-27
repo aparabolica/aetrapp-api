@@ -1,8 +1,11 @@
+const config = require('config');
 const moment = require('moment-timezone');
 const csvStringify = require('csv-stringify');
 
 module.exports = function () {
   const app = this;
+
+  const apiUrl = config.get('apiUrl');
 
   const sequelizeClient = app.get('sequelizeClient');
 
@@ -21,7 +24,8 @@ module.exports = function () {
       'updatedAt',
       'isActive',
       'cycleDuration',
-      'cycleStart'
+      'cycleStart',
+      'imageUrl'
     ]];
     var query = "SELECT * FROM traps ORDER BY \"createdAt\" ASC";
     sequelizeClient.query(query)
@@ -42,7 +46,8 @@ module.exports = function () {
             moment(item.updatedAt).tz("Brazil/East").format(),
             item.isActive ? 1 : 0,
             item.cycleDuration,
-            moment(item.cycleStart).tz("Brazil/East").format()
+            moment(item.cycleStart).tz("Brazil/East").format(),
+            item.imageId && (apiUrl + '/files/' + item.imageId),
           ]);
         });
         csvStringify(results, function (err, csv) {
@@ -59,15 +64,37 @@ module.exports = function () {
   });
 
   app.get("/downloads/samples.csv", function (req, res) {
-    var results = [['id', 'createdAt']];
+    var results = [[
+      'id',
+      'trapId',
+      'status',
+      'eggCount',
+      'errorCode',
+      'errorMessage',
+      'createdAt',
+      'updatedAt',
+      'collectedAt',
+      'analysisStartedAt',
+      'analysisFinishedAt',
+      'imageUrl',
+    ]];
     var query = "SELECT * FROM samples ORDER BY \"createdAt\" ASC";
     sequelizeClient.query(query)
       .then(function (queryResult) {
         queryResult[0].forEach(function (item) {
-          var time = moment(item.createdAt);
           results.push([
             item.id,
-            time.tz("Brazil/East").format()
+            item.trapId,
+            item.status,
+            item.eggCount,
+            item.error && item.error.code,
+            item.error && item.error.message,
+            item.createdAt && moment(item.createdAt).tz("Brazil/East").format(),
+            item.updatedAt && moment(item.updatedAt).tz("Brazil/East").format(),
+            item.collectedAt && moment(item.collectedAt).tz("Brazil/East").format(),
+            item.analysisStartedAt && moment(item.analysisStartedAt).tz("Brazil/East").format(),
+            item.analysisFinishedAt && moment(item.analysisFinishedAt).tz("Brazil/East").format(),
+            item.blobId && (apiUrl + '/files/' + item.blobId),
           ]);
         });
         csvStringify(results, function (err, csv) {
