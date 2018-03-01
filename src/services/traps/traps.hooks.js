@@ -95,25 +95,6 @@ const sampleSchema = {
   }
 };
 
-const deactivateActiveTrap = function () {
-  return function (hook) {
-    return hook.app
-      .service("traps")
-      .patch(null, { isActive: false }, {
-        query: {
-          ownerId: hook.params.user.id,
-          isActive: true
-        }
-      })
-      .then(res => {
-        return hook;
-      })
-      .catch(err => {
-        return new errors.GeneralError("Internal error.");
-      });
-  };
-};
-
 const storeBlob = function () {
   return function (hook) {
     const blobService = hook.app.service("uploads");
@@ -197,8 +178,7 @@ module.exports = {
       iff(
         hook => {
           return hook.data && hook.data.isActive
-        },
-        deactivateActiveTrap()
+        }
       )
     ],
     remove: [...restrict]
