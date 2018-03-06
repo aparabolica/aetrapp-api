@@ -185,7 +185,7 @@ module.exports = {
   },
 
   after: {
-    all: [populate(sampleSchema)],
+    all: [iff(isProvider('external'), [populate(sampleSchema)])],
     find: [],
     get: [],
     create: [notifyCollectWindow()],
