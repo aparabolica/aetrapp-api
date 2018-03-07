@@ -31,6 +31,5 @@
       "usernameField": "email",
       "passwordField": "password"
     }
-  },
-  "postgres": "postgres://aetrapp:aetrapp@postgres:5432/aetrapp"
+  }
 }

@@ -37,6 +37,13 @@ services:
           "webappUrl": "http://localhost:8000",
           "apiUrl": "http://localhost:3030",
           "ipsUrl": "http://localhost:3131",
+          "sequelize": {
+            "dialect": "postgresql",
+            "database": "aetrapp_db",
+            "username": "aetrapp_db_user",
+            "password": "aetrapp_db_password",
+            "host": "postgresql_host"
+          },
           "supportEmail": "suporte@aetrapp.org",
           "mailgun": {
             "api_key": "<mailgunApiKey>",
