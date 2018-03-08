@@ -130,9 +130,9 @@ const registerAnalysis = function (hook) {
       jobSchedule: "now",
       jobData: {
         image: {
-          url: `${hook.app.get("siteUrl")}/files/${sample.blobId}`
+          url: `${apiUrl}/files/${sample.blobId}`
         },
-        webhookUrl: `${hook.app.get("siteUrl")}/samples/analysis/${jobId}`
+        webhookUrl: `${apiUrl}/samples/analysis/${jobId}`
       }
     })
     .then(res => {
