@@ -16,14 +16,6 @@ module.exports = function (app) {
       defaultValue: true
     },
 
-    statusCode: {
-      type: DataTypes.INTEGER
-    },
-
-    statusMessage: {
-      type: DataTypes.TEXT
-    },
-
     cycleDuration: { // in days
       type: DataTypes.FLOAT,
       defaultValue: 2
