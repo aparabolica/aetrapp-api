@@ -46,6 +46,7 @@ module.exports = function (app) {
       as: 'maintainers',
       through: 'citiesMaintainers'
     });
+    cities.hasMany(models.traps);
   };
 
   return cities;
