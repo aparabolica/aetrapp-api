@@ -86,8 +86,8 @@ module.exports = function (app) {
     });
 
   traps.associate = function (models) { // eslint-disable-line no-unused-vars
-    // Define associations here
-    // See http://docs.sequelizejs.com/en/latest/docs/associations/
+    traps.belongsTo(models.cities);
+    traps.hasMany(models.samples);
   };
 
   return traps;

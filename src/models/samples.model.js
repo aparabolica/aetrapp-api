@@ -80,16 +80,15 @@ module.exports = function (app) {
       allowNull: false
     }
   }, {
-    hooks: {
-      beforeCount(options) {
-        options.raw = true;
+      hooks: {
+        beforeCount(options) {
+          options.raw = true;
+        }
       }
-    }
-  });
+    });
 
   samples.associate = function (models) { // eslint-disable-line no-unused-vars
-    // Define associations here
-    // See http://docs.sequelizejs.com/en/latest/docs/associations/
+    samples.belongsTo(models.traps)
   };
 
   return samples;

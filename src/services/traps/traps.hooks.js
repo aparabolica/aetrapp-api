@@ -125,17 +125,47 @@ const notifyCollectWindow = function () {
   }
 }
 
+const handleSampleInclude = function () {
+  return function (hook) {
+    const { query } = hook.params;
+    if (query && query.$include && query.$include['samples']) {
+      const Samples = hook.app.services.samples.Model;
+      const { attributes, where } = query.$include['samples'];
+      hook.params.sequelize = {
+        raw: false,
+        include: [{
+          model: Samples,
+          required: false,
+          attributes: attributes && attributes.split(','),
+          where,
+          order: [Samples, 'collectedAt', 'DESC']
+        }],
+      };
+    }
+    delete query.$include;
+  }
+  return hook;
+}
+
+
 const parseSortByCity = function () {
   return function (hook) {
     const { query } = hook.params;
     if (query && query.$sort && query.$sort['city']) {
       const City = hook.app.services.cities.Model;
+
+      if (hook.params.sequelize && hook.params.sequelize.include) {
+        hook.params.sequelize.include.push({ model: City });
+      } else {
+        hook.params.sequelize = {
+          raw: false,
+          include: [{ model: City, attributes: ['id', 'stateId', 'name'] }]
+        }
+      }
+
       const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
-      hook.params.sequelize = {
-        raw: false,
-        include: [{ model: City }],
-        order: [[City, 'stateId', sortOrder], [City, 'name', sortOrder]]
-      };
+      hook.params.sequelize.order = [[City, 'stateId', sortOrder], [City, 'name', sortOrder]];
+
       delete query.$sort['city'];
     }
     return hook;
@@ -146,7 +176,7 @@ module.exports = {
   before: {
     all: [],
     find: [
-      iff(isProvider('external'), [parseSortByCity()]),
+      iff(isProvider('external'), [handleSampleInclude(), parseSortByCity()]),
       parseDateQuery("createdAt"),
       parseDateQuery("updatedAt"),
     ],
