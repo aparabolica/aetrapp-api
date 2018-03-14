@@ -2,6 +2,7 @@
 const {
   discard,
   disallow,
+  fastJoin,
   pluckQuery,
   preventChanges,
   iff,
@@ -30,9 +31,21 @@ const restrict = [
   })
 ];
 
-
-
 const { findByEmail } = require("../../validations");
+
+const trapResolver = {
+  joins: {
+    traps: (...args) => async (user, context) => {
+      const traps = context.app.services['traps'];
+      user.traps = (await traps.find({
+        query: {
+          ownerId: user.id
+        },
+        paginate: false
+      }))
+    }
+  }
+}
 
 module.exports = {
   before: {
@@ -71,7 +84,7 @@ module.exports = {
       ),
     ],
     find: [iff(!isProvider("server"), keep("email"))],
-    get: [],
+    get: [fastJoin(trapResolver)],
     create: [
       sendVerificationEmail(),
       verifyHooks.removeVerification(),
