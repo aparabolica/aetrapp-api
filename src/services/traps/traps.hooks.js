@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { getItems, iff, isProvider, populate } = require("feathers-hooks-common");
+const { getItems, iff, isProvider } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
 
@@ -60,40 +60,6 @@ const restrict = [
   ])
 ];
 
-const sampleSchema = {
-  schema: {
-    include: [
-      {
-        service: "samples",
-        parentField: "id",
-        childField: "trapId",
-        asArray: true,
-        query: {
-          $select: ["id"],
-          $sort: { collectedAt: -1 }
-        }
-      },
-      {
-        service: "cities",
-        nameAs: "city",
-        parentField: "addressCityId",
-        childField: "id"
-      },
-      {
-        service: "samples",
-        nameAs: "eggCountSeries",
-        parentField: "id",
-        childField: "trapId",
-        query: {
-          status: "valid",
-          $select: ["id", "eggCount", "collectedAt"],
-          $sort: { collectedAt: 1 }
-        },
-        asArray: true
-      }
-    ]
-  }
-};
 
 const storeBlob = function () {
   return function (hook) {
@@ -117,7 +83,7 @@ const notifyCollectWindow = function () {
         recipientId: trap.ownerId,
         type: 'direct',
         title: "Armadilha criada",
-        message: "Você deverá remover o cartão no endereço " +trap.addressStreet+ " em "
+        message: "Você deverá remover o cartão no endereço " + trap.addressStreet + " em "
           + moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').fromNow()
       })
       .catch(err => {
@@ -159,12 +125,30 @@ const notifyCollectWindow = function () {
   }
 }
 
+const parseSortByCity = function () {
+  return function (hook) {
+    const { query } = hook.params;
+    if (query && query.$sort && query.$sort['city']) {
+      const City = hook.app.services.cities.Model;
+      const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
+      hook.params.sequelize = {
+        raw: false,
+        include: [{ model: City }],
+        order: [[City, 'stateId', sortOrder], [City, 'name', sortOrder]]
+      };
+      delete query.$sort['city'];
+    }
+    return hook;
+  }
+}
+
 module.exports = {
   before: {
     all: [],
     find: [
+      iff(isProvider('external'), [parseSortByCity()]),
       parseDateQuery("createdAt"),
-      parseDateQuery("updatedAt")
+      parseDateQuery("updatedAt"),
     ],
     get: [],
     create: [
@@ -185,7 +169,7 @@ module.exports = {
   },
 
   after: {
-    all: [iff(isProvider('external'), [populate(sampleSchema)])],
+    all: [],
     find: [],
     get: [],
     create: [notifyCollectWindow()],
