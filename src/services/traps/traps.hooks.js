@@ -49,7 +49,7 @@ const restrict = [
           .users
           .findById(id)
           .then(function (user) {
-            return user.hasCity(trap.addressCityId).then(result => {
+            return user.hasCity(trap.cityId).then(result => {
               if (result)
                 return hook;
               else

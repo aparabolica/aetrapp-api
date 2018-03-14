@@ -52,7 +52,7 @@ module.exports = function (app) {
     addressPostcode: {
       type: DataTypes.STRING
     },
-    addressCityId: {
+    cityId: {
       type: DataTypes.STRING
     },
     addressStateId: {

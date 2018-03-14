@@ -11,7 +11,7 @@ const cityResolver = {
       const trapIds = (await traps.find({
         query: {
           $select: ['id'],
-          addressCityId: city.id
+          cityId: city.id
         },
         paginate: false
       }));
