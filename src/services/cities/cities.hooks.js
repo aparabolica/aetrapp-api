@@ -41,6 +41,11 @@ const cityResolver = {
 
       city.eggMeanSeries = weeks;
 
+      // set current week mean count
+      const currentWeek = moment().format('YYYY-w');
+      if (weeks.hasOwnProperty(currentWeek)) {
+        city.currentMeanCount = weeks[currentWeek];
+      }
     }
   }
 }
