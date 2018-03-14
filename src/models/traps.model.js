@@ -32,22 +32,19 @@ module.exports = function (app) {
     addressStreet: {
       type: DataTypes.STRING
     },
-    addressNumber: {
-      type: DataTypes.STRING
-    },
     addressComplement: {
       type: DataTypes.STRING
     },
-    addressNeighborhood: {
+    neighborhood: {
       type: DataTypes.STRING
     },
-    addressPostcode: {
+    postcode: {
       type: DataTypes.STRING
     },
     cityId: {
       type: DataTypes.STRING
     },
-    addressStateId: {
+    stateId: {
       type: DataTypes.STRING
     },
 
