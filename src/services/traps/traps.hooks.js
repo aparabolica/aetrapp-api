@@ -1,9 +1,10 @@
 const _ = require("lodash");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { getItems, iff, isProvider } = require("feathers-hooks-common");
+const { getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
+const dehydrate = require('feathers-sequelize/hooks/dehydrate');
 
 // Localized moment.js
 const moment = require("moment/min/moment-with-locales");
@@ -125,26 +126,19 @@ const notifyCollectWindow = function () {
   }
 }
 
-const handleSampleInclude = function () {
+const includeSamples = function () {
   return function (hook) {
-    const { query } = hook.params;
-    if (query && query.$include && query.$include['samples']) {
-      const Samples = hook.app.services.samples.Model;
-      const { attributes, where } = query.$include['samples'];
-      hook.params.sequelize = {
-        raw: false,
-        include: [{
-          model: Samples,
-          required: false,
-          attributes: attributes && attributes.split(','),
-          where,
-          order: [Samples, 'collectedAt', 'DESC']
-        }],
-      };
-    }
-    delete query.$include;
+    const Samples = hook.app.services.samples.Model;
+    hook.params.sequelize = {
+      raw: false,
+      include: [{
+        model: Samples,
+        required: false,
+        attributes: ['id', 'eggCount', 'collectedAt', 'status'],
+        order: [Samples, 'collectedAt', 'DESC']
+      }],
+    };
   }
-  return hook;
 }
 
 
@@ -172,11 +166,38 @@ const parseSortByCity = function () {
   }
 }
 
+function addDelayedStatus() {
+
+  function setDelayedStatus(trap) {
+    trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').toDate();
+    const now = new Date();
+    if (trap.isActive && trap.windowStart.getTime() < now.getTime()) {
+      trap.isDelayed = true;
+    } else {
+      trap.isDelayed = false;
+    }
+    return trap;
+  }
+
+  return function (hook) {
+    let traps = getItems(hook);
+    if (!Array.isArray(traps)) {
+      traps = setDelayedStatus(traps);
+    } else {
+      traps = traps.map(trap => {
+        return setDelayedStatus(trap);
+      });
+    }
+    replaceItems(hook, traps);
+    return hook;
+  }
+}
+
 module.exports = {
   before: {
     all: [],
     find: [
-      iff(isProvider('external'), [handleSampleInclude(), parseSortByCity()]),
+      iff(isProvider('external'), [includeSamples(), parseSortByCity()]),
       parseDateQuery("createdAt"),
       parseDateQuery("updatedAt"),
     ],
@@ -200,8 +221,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
-    get: [],
+    find: [dehydrate(), addDelayedStatus()],
+    get: [dehydrate(), addDelayedStatus()],
     create: [notifyCollectWindow()],
     update: [],
     patch: [],
