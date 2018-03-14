@@ -2,6 +2,8 @@ const config = require('config');
 const moment = require('moment-timezone');
 const csvStringify = require('csv-stringify');
 
+const { authenticate } = require('@feathersjs/authentication').express;
+
 module.exports = function () {
   const app = this;
 
@@ -16,10 +18,10 @@ module.exports = function () {
       'lat',
       'addressStreet',
       'addressComplement',
-      'addressNeighborhood',
-      'addressPostcode',
+      'neighborhood',
+      'postcode',
       'cityId',
-      'addressStateId',
+      'stateId',
       'createdAt',
       'updatedAt',
       'isActive',
@@ -38,10 +40,10 @@ module.exports = function () {
             item.coordinates.coordinates[1],
             item.addressStreet,
             item.addressComplement,
-            item.addressNeighborhood,
-            item.addressPostcode,
+            item.neighborhood,
+            item.postcode,
             item.cityId,
-            item.addressStateId,
+            item.stateId,
             moment(item.createdAt).tz("Brazil/East").format(),
             moment(item.updatedAt).tz("Brazil/East").format(),
             item.isActive ? 1 : 0,
@@ -101,6 +103,75 @@ module.exports = function () {
           if (err) return res.status(500).send({ error: 'Error generating csv file.' });
           else {
             res.set('Content-disposition', 'attachment; filename=samples.csv');
+            res.set('Content-type', 'text/csv');
+            res.send(csv);
+          }
+        });
+      }).catch(function (err) {
+        if (err) return res.status(500).send({ error: 'Error generating csv file.' });
+      });
+  });
+
+
+  /*
+    Using express auth from this recipe:
+    https://docs.feathersjs.com/guides/auth/recipe.express-middleware.html
+
+    To test this endpoint:
+
+    curl 'http://localhost:3030/authentication/' -H 'Content-Type: application/json' --data-binary '{ "strategy": "local", "email": "user email", "password": "secret" }'
+
+    curl 'http://localhost:3030/downloads/users.csv' -H 'Authorization: <token>'
+
+  */
+  app.use("/downloads/users.csv", authenticate('jwt'), function (req, res) {
+
+    // check if user is admin
+    if (!req.user.roles.includes('admin')) {
+      res.status(401).send({ error: 'User must have admin role.' });
+    }
+
+    var results = [[
+      'id',
+      'email',
+      'landlineNumber',
+      'cellphoneNumber',
+      'firstName',
+      'lastName',
+      'dateOfBirth',
+      'gender',
+      'roles',
+      'isActive',
+      'isVerified',
+      'createdAt',
+      'updatedAt',
+      'lastSignedInAt',
+    ]];
+    var query = "SELECT * FROM users ORDER BY \"createdAt\" ASC";
+    sequelizeClient.query(query)
+      .then(function (queryResult) {
+        queryResult[0].forEach(function (item) {
+          results.push([
+            item.id,
+            item.email,
+            item.landlineNumber,
+            item.cellphoneNumber,
+            item.firstName,
+            item.lastName,
+            item.dateOfBirth,
+            item.gender,
+            item.roles,
+            item.isActive,
+            item.isVerified,
+            item.createdAt && moment(item.createdAt).tz("Brazil/East").format(),
+            item.updatedAt && moment(item.updatedAt).tz("Brazil/East").format(),
+            item.lastSignedInAt && moment(item.lastSignedInAt).tz("Brazil/East").format(),
+          ]);
+        });
+        csvStringify(results, function (err, csv) {
+          if (err) return res.status(500).send({ error: 'Error generating csv file.' });
+          else {
+            res.set('Content-disposition', 'attachment; filename=users.csv');
             res.set('Content-type', 'text/csv');
             res.send(csv);
           }
