@@ -84,7 +84,7 @@ module.exports = {
       ),
     ],
     find: [iff(!isProvider("server"), keep("email"))],
-    get: [fastJoin(trapResolver)],
+    get: [iff(isProvider('external'), fastJoin(trapResolver))],
     create: [
       sendVerificationEmail(),
       verifyHooks.removeVerification(),
