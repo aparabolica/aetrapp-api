@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
+const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
 const dehydrate = require('feathers-sequelize/hooks/dehydrate');
@@ -9,6 +9,10 @@ const dehydrate = require('feathers-sequelize/hooks/dehydrate');
 // Localized moment.js
 const moment = require("moment/min/moment-with-locales");
 moment.locale("pt-br");
+
+/*
+ * Authentication
+ */
 
 const loadTrap = function () {
   return function (hook) {
@@ -27,7 +31,6 @@ const loadTrap = function () {
       });
   };
 };
-
 
 const restrict = [
   iff(isProvider('external'), [
@@ -61,6 +64,9 @@ const restrict = [
   ])
 ];
 
+/*
+ * Blob
+ */
 
 const storeBlob = function () {
   return function (hook) {
@@ -71,6 +77,10 @@ const storeBlob = function () {
     });
   };
 };
+
+/*
+ * Notification
+ */
 
 const notifyCollectWindow = function () {
   return function (hook) {
@@ -126,48 +136,59 @@ const notifyCollectWindow = function () {
   }
 }
 
-const includeSamples = function () {
-  return function (hook) {
-    const Samples = hook.app.services.samples.Model;
-    hook.params.sequelize = {
-      raw: false,
-      include: [{
-        model: Samples,
-        required: false,
-        attributes: ['id', 'eggCount', 'collectedAt', 'status'],
-        order: [Samples, 'collectedAt', 'DESC']
-      }],
-    };
-  }
-}
+/*
+ * Parse sort by city
+ */
 
-
-const parseSortByCity = function () {
+const sortByCity = function () {
   return function (hook) {
     const { query } = hook.params;
-    if (query && query.$sort && query.$sort['city']) {
-      const City = hook.app.services.cities.Model;
+    const City = hook.app.services.cities.Model;
+    const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
 
-      if (hook.params.sequelize && hook.params.sequelize.include) {
-        hook.params.sequelize.include.push({ model: City });
-      } else {
-        hook.params.sequelize = {
-          raw: false,
-          include: [{ model: City, attributes: ['id', 'stateId', 'name'] }]
-        }
-      }
-
-      const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
-      hook.params.sequelize.order = [[City, 'stateId', sortOrder], [City, 'name', sortOrder]];
-
-      delete query.$sort['city'];
+    hook.params.sequelize = {
+      raw: false,
+      include: [{ model: City, attributes: ['id', 'stateId', 'name'] }],
+      order: [[City, 'stateId', sortOrder], [City, 'name', sortOrder]]
     }
+
+    delete query.$sort['city'];
     return hook;
   }
 }
 
-function addDelayedStatus() {
+const parseSortByCity = [
+  iff(hook => {
+    const { query } = hook.params;
+    return query && query.$sort && query.$sort['city'];
+  }, sortByCity()),
+];
 
+/*
+ * Include samples resolver
+ */
+
+const includeSamplesResolver = {
+  joins: {
+    samples: $select => async (trap, context) => {
+      const samples = context.app.services['samples'];
+      trap.samples = await samples.find({
+        query: {
+          trapId: trap.id,
+          $select: ['id', 'eggCount', 'collectedAt', 'status'],
+          $sort: { collectedAt: -1 },
+        },
+        paginate: false
+      });
+    }
+  }
+};
+
+/*
+ * addDelayedStatus
+ */
+
+function addDelayedStatus() {
   function setDelayedStatus(trap) {
     trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').toDate();
     const now = new Date();
@@ -193,13 +214,17 @@ function addDelayedStatus() {
   }
 }
 
+/*
+ * The hooks
+ */
+
 module.exports = {
   before: {
     all: [],
     find: [
-      iff(isProvider('external'), [includeSamples(), parseSortByCity()]),
+      ...parseSortByCity,
       parseDateQuery("createdAt"),
-      parseDateQuery("updatedAt"),
+      parseDateQuery("updatedAt")
     ],
     get: [],
     create: [
@@ -221,8 +246,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [dehydrate(), addDelayedStatus()],
-    get: [dehydrate(), addDelayedStatus()],
+    find: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
+    get: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
     create: [notifyCollectWindow()],
     update: [],
     patch: [],
