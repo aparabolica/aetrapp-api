@@ -1,13 +1,13 @@
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
-const shortid = require('shortid');
+const generateId = require('../helpers/generate-id');
 
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
   const users = sequelizeClient.define('users', {
     id: {
       type: Sequelize.STRING,
-      defaultValue: shortid.generate,
+      defaultValue: generateId,
       primaryKey: true
     },
     password: {

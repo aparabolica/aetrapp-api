@@ -2,7 +2,7 @@ const axios = require("axios");
 const Sequelize = require("sequelize");
 const errors = require("@feathersjs/errors");
 const fs = require("fs");
-const shortid = require("shortid");
+const generateId = require("../../helpers/generate-id");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const {
   restrictToRoles,
@@ -40,7 +40,7 @@ const registerAnalysisJob = function () {
   return function (hook) {
     const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
     const samples = hook.app.service("samples");
-    const jobId = shortid.generate();
+    const jobId = generateId();
     axios
       .post(ipsUrl, {
         jobName: "process image",
