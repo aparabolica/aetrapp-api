@@ -38,7 +38,7 @@ const storeBlob = function () {
 // create analysis job
 const registerAnalysisJob = function () {
   return function (hook) {
-    const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
+    const ipsUrl = config.get("ipsUrl") + "/agenda/api/jobs/create";
     const samples = hook.app.service("samples");
     const jobId = generateId();
     axios
