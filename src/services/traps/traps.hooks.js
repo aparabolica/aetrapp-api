@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const async = require("async");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { associateCurrentUser } = require("feathers-authentication-hooks");
 const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
@@ -82,52 +83,71 @@ const storeBlob = function () {
  * Notification
  */
 
-const notifyCollectWindow = function () {
+const removeNotifications = function () {
+  return function (hook) {
+    const trap = _.castArray(getItems(hook))[0];
+
+    // Remove future notifications associated with this trap
+    hook.app
+      .service("notifications")
+      .find({
+        query: {
+          trapId: trap.id
+        },
+        paginate: false
+      })
+      .then(results => {
+        async.eachSeries(results, (item, doneItem) => {
+          hook.app
+            .service("notifications")
+            .remove(item.id)
+            .then(() => {
+              doneItem();
+            })
+            .catch(doneItem);
+        }, (err, results) => {
+          if (err) console.log("Error removing future notifications", err);
+        });
+      })
+      .catch(err => {
+        console.log('Error removing notifications');
+        console.log(err);
+      });
+  }
+}
+
+const addNotifications = function () {
   return function (hook) {
     const trap = _.castArray(getItems(hook))[0];
     trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days');
 
-    // trap was created notification
+    // sample window is near notification
+    const sampleAlmostReadyAt = moment(trap.cycleStart).add(trap.cycleDuration - 2, 'days').toDate();
     hook.app
       .service("notifications")
       .create({
         recipientId: trap.ownerId,
         type: 'direct',
-        title: "Armadilha criada",
-        message: "Você deverá remover o cartão no endereço " + trap.addressStreet + " em "
-          + moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').fromNow()
+        trapId: trap.id,
+        title: "Uma coleta está próxima",
+        deliveryTime: sampleAlmostReadyAt,
+        message: "A armadilha no endereço " + trap.addressStreet + ", estará pronta para coleta no dia " + moment(trap.windowStart).format("DD/MM/YYYY")
       })
       .catch(err => {
         console.log('Error creating notification');
         console.log(err);
       });
 
-    // sample window is near notification
+    // sample window is ready notification
     hook.app
       .service("notifications")
       .create({
         recipientId: trap.ownerId,
         type: 'direct',
-        data: { trapId: trap.id },
-        title: "Coleta amanhã",
-        deliveryTime: moment(trap.cycleStart).add(trap.cycleDuration - 2, 'days').toDate(),
-        message: "A coleta da amostra deverá ser feita amanhã"
-      })
-      .catch(err => {
-        console.log('Error creating notification');
-        console.log(err);
-      });
-
-    // sample window is near notification
-    hook.app
-      .service("notifications")
-      .create({
-        recipientId: trap.ownerId,
-        type: 'direct',
-        data: { trapId: trap.id },
-        title: "Coleta hoje:",
-        deliveryTime: moment(trap.cycleStart).add(10, 'days').toDate(),
-        message: "Retire o cartão de amostra da armadilha"
+        trapId: trap.id,
+        title: "Uma coleta está pronta",
+        deliveryTime: moment(trap.windowStart).toDate(),
+        message: "Retire o cartão de amostra da armadilha no endereço " + trap.addressStreet + "."
       })
       .catch(err => {
         console.log('Error creating notification');
@@ -233,14 +253,7 @@ module.exports = {
       storeBlob()
     ],
     update: [...restrict],
-    patch: [
-      ...restrict,
-      iff(
-        hook => {
-          return hook.data && hook.data.isActive
-        }
-      )
-    ],
+    patch: [...restrict],
     remove: [...restrict]
   },
 
@@ -248,10 +261,13 @@ module.exports = {
     all: [],
     find: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
     get: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
-    create: [notifyCollectWindow()],
+    create: [addNotifications()],
     update: [],
-    patch: [],
-    remove: []
+    patch: [
+      iff(hook => { return hook.data && hook.data.isActive == false }, removeNotifications()),
+      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeNotifications(), addNotifications()])
+    ],
+    remove: [removeNotifications()]
   },
 
   error: {
