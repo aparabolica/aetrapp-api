@@ -19,6 +19,9 @@ module.exports = function (app) {
     type: {
       type: DataTypes.STRING
     },
+    trapId: {
+      type: DataTypes.STRING
+    },
     senderId: {
       type: DataTypes.STRING
     },
