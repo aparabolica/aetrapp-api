@@ -1,19 +1,27 @@
+const _ = require("lodash");
 const axios = require("axios");
+
+// Config
+const config = require('config');
+const apiUrl = config.get('apiUrl');
+
+// Helper
+const generateId = require("../../helpers/generate-id");
+
+// Feathers & Sequelize
 const Sequelize = require("sequelize");
 const errors = require("@feathersjs/errors");
 const fs = require("fs");
-const generateId = require("../../helpers/generate-id");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const {
   restrictToRoles,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
-const {
-  iff
-} = require("feathers-hooks-common");
+const { iff, isProvider, getItems } = require("feathers-hooks-common");
 
-const config = require('config');
-const apiUrl = config.get('apiUrl');
+/*
+ * Hooks
+ */
 
 const restrict = [
   authenticate("jwt"),
@@ -122,7 +130,7 @@ const registerAnalysis = function (hook) {
   const sample = hook.sample || hook.result;
   const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
   const samples = hook.app.service("samples");
-  const jobId = shortid.generate();
+  const jobId = generateId();
   if (hook.method == "patch") hook.data.jobId = jobId;
   return axios
     .post(ipsUrl, {
@@ -173,6 +181,33 @@ const removeSameDayDuplicates = function (hook) {
   };
 }
 
+const addNotification = function () {
+  return function (hook) {
+    const sample = _.castArray(getItems(hook))[0];
+
+    // "Sample is finished" notification
+    hook.app
+      .service("notifications")
+      .create({
+        recipientId: sample.ownerId,
+        type: 'sample-analysis-finished',
+        data: {
+          sampleId: sample.id
+        },
+        title: "Análise de amostra concluída",
+        message: "Estão disponíveis os resultados da amostra " + sample.id + "."
+      })
+      .then(n => {
+        console.log('Notification was created');
+        console.log(n);
+      })
+      .catch(err => {
+        console.log('Error creating notification');
+        console.log(err);
+      });
+  }
+}
+
 module.exports = {
   before: {
     all: [],
@@ -189,8 +224,7 @@ module.exports = {
       ...restrict,
       iff(
         hook => { return hook.data && hook.data.status == "analysing" && !hook.data.jobId },
-        loadSample(),
-        startAnalysis()
+        [loadSample(), startAnalysis()]
       )
     ],
     remove: [...restrict]
@@ -202,7 +236,9 @@ module.exports = {
     get: [],
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
-    patch: [],
+    patch: [iff(
+      hook => { return hook.data && hook.data.status != "analysing" },
+      addNotification())], // ips result
     remove: []
   },
 
