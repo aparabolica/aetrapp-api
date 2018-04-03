@@ -1,7 +1,7 @@
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { restrictToRoles, associateCurrentUser } = require('feathers-authentication-hooks');
 const { iff, isProvider, getItems } = require("feathers-hooks-common");
-const { scheduleNotification } = require('../../lib/push-notifications');
+const { scheduleNotification } = require('../../helpers/push-notifications');
 
 const restrict = [
   iff(isProvider('external'), [
