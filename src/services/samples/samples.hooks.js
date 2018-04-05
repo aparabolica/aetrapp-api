@@ -17,7 +17,7 @@ const {
   restrictToRoles,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
-const { iff, isProvider, getItems } = require("feathers-hooks-common");
+const { iff, isProvider, fastJoin, getItems } = require("feathers-hooks-common");
 
 /*
  * Hooks
@@ -197,14 +197,24 @@ const addNotification = function () {
         title: "Análise de amostra concluída",
         message: "Estão disponíveis os resultados da amostra " + sample.id + "."
       })
-      .then(n => {
-        console.log('Notification was created');
-        console.log(n);
-      })
       .catch(err => {
         console.log('Error creating notification');
         console.log(err);
       });
+  }
+}
+
+const sampleResolvers = {
+  joins: {
+    owner: (...args) => async (sample, context) => {
+      const users = context.app.services['users'];
+      console.log('sample.ownerId', sample.ownerId);
+      sample.owner = (await users.get(sample.ownerId, {
+        query: {
+          $select: [ 'id', 'firstName', 'lastName' ]
+        }
+      }))
+    }
   }
 }
 
@@ -233,7 +243,7 @@ module.exports = {
   after: {
     all: [],
     find: [],
-    get: [],
+    get: [fastJoin(sampleResolvers)],
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
     patch: [iff(
