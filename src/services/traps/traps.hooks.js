@@ -200,6 +200,14 @@ const includeSamplesResolver = {
         },
         paginate: false
       });
+    },
+    city: (...args) => async (trap, context) => {
+      const cities = context.app.services['cities'];
+      try {
+        trap.city = (await cities.get(trap.cityId))
+      } catch (error) {
+        console.log(`City ${trap.cityId} not found.`);
+      }
     }
   }
 };
