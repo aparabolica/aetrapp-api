@@ -208,12 +208,15 @@ const sampleResolvers = {
   joins: {
     owner: (...args) => async (sample, context) => {
       const users = context.app.services['users'];
-      console.log('sample.ownerId', sample.ownerId);
-      sample.owner = (await users.get(sample.ownerId, {
-        query: {
-          $select: [ 'id', 'firstName', 'lastName' ]
-        }
-      }))
+      try {
+        sample.owner = (await users.get(sample.ownerId, {
+          query: {
+            $select: [ 'id', 'firstName', 'lastName' ]
+          }
+        }))
+      } catch (error) {
+        console.log(`User ${sample.ownerId} not found.`);
+      }
     }
   }
 }
@@ -242,7 +245,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [fastJoin(sampleResolvers)],
     get: [fastJoin(sampleResolvers)],
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
