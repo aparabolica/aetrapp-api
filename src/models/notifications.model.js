@@ -28,7 +28,7 @@ module.exports = function (app) {
     recipientId: {
       type: DataTypes.STRING
     },
-    data: {
+    payload: {
       type: DataTypes.JSONB
     },
     includeSegments: {

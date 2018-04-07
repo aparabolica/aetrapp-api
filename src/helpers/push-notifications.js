@@ -11,7 +11,7 @@ const defaultHeaders = {
 }
 
 module.exports = {
-  scheduleNotification: function (userId, payload, send_after) {
+  scheduleNotification: function (userId, message, payload, send_after) {
     return request
       .post("https://onesignal.com/api/v1/notifications")
       .set(defaultHeaders)
@@ -30,9 +30,9 @@ module.exports = {
           en: "Aetrapp"
         },
         contents: {
-          en: payload.message
+          en: message
         },
-        data: payload.data
+        data: payload
       })
       .then(res=>{
         return res.body.id;
