@@ -30,17 +30,15 @@ module.exports = {
 
 function registerPushNotification() {
   return function (hook) {
-    const { recipientId, title, data, deliveryTime, type } = hook.data;
+    const { recipientId, title, payload, deliveryTime, type } = hook.data;
     return scheduleNotification(
       recipientId,
-      {
-        data,
-        message: title
-      },
+      title,
+      payload,
       deliveryTime
     ).then(oneSignalId => {
-        hook.data.data = {
-          ...hook.data.data,
+        hook.data.payload = {
+          ...hook.data.payload,
           oneSignalId
         }
         return hook;
@@ -58,7 +56,7 @@ function cancelPushNotification() {
       .service("notifications")
       .get(hook.id)
       .then(notification => {
-        return unscheduleNotification(notification.data.oneSignalId);
+        return unscheduleNotification(notification.payload.oneSignalId);
       })
       .catch(err => {
         console.log("Error canceling notification at OneSignal: " + err.message);

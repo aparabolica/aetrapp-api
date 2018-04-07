@@ -29,7 +29,7 @@ module.exports = function (app) {
       type: DataTypes.STRING
     },
     data: {
-      type: DataTypes.JSON
+      type: DataTypes.JSONB
     },
     includeSegments: {
       type: DataTypes.ARRAY(DataTypes.STRING)
