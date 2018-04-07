@@ -190,11 +190,12 @@ const addNotification = function () {
       .service("notifications")
       .create({
         recipientId: sample.ownerId,
-        type: 'sample-analysis-finished',
-        data: {
+        payload: {
+          type: 'sample-analysis-finished',
+          deeplink: 'sample/' + sample.id,
           sampleId: sample.id
         },
-        title: "Análise de amostra concluída",
+        title: "Análise de amostra concluída.",
         message: "Estão disponíveis os resultados da amostra " + sample.id + "."
       })
       .catch(err => {
