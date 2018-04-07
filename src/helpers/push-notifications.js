@@ -1,22 +1,21 @@
-const request = require('request');
-
 // Config
 const config = require("config");
 const { API_KEY, APP_ID } = config.get("oneSignal");
-let baseRequest = request.defaults({
-  headers: {
-    authorization: 'Basic ' + API_KEY,
-    'cache-control': 'no-cache',
-    'content-type': 'application/json; charset=utf-8'
-  }
-});
+
+// HTTP Agent
+const request = require('superagent');
+const defaultHeaders = {
+  authorization: 'Basic ' + API_KEY,
+  'cache-control': 'no-cache',
+  'content-type': 'application/json; charset=utf-8'
+}
 
 module.exports = {
-  scheduleNotification: function (userId, payload, send_after, donescheduleNotification) {
-    baseRequest({
-      method: 'POST',
-      url: 'https://onesignal.com/api/v1/notifications',
-      body: JSON.stringify({
+  scheduleNotification: function (userId, payload, send_after) {
+    return request
+      .post("https://onesignal.com/api/v1/notifications")
+      .set(defaultHeaders)
+      .send({
         app_id: APP_ID,
         send_after,
         filters: [
@@ -33,14 +32,18 @@ module.exports = {
         contents: {
           en: payload.message
         },
-        data: {
-          deeplink: payload.deeplink
-        }
+        data: payload.data
       })
-    }, (err, res, body) => {
-      if (err) console.log('error creating notification', err);
-    });
+      .then(res=>{
+        return res.body.id;
+      });
+  },
+  unscheduleNotification: function(notificationId){
+    return request
+      .delete(`https://onesignal.com/api/v1/notifications/${notificationId}`)
+      .set(defaultHeaders)
+      .send({
+        app_id: APP_ID,
+      });
   }
-
 }
-
