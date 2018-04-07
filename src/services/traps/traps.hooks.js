@@ -180,7 +180,7 @@ const addNotifications = function () {
           deeplink: 'trap/' + trap.id,
           trapId: trap.id
         },
-        title: "A armadilha está vencida, desative ou inicie novo ciclo!",
+        title: "A armadilha está vencida, desative-a ou inicie novo ciclo!",
         deliveryTime: moment(trap.cycleStart).add(trap.cycleDuration + i, 'days'),
         message: `Você não realizou a manutenção semanal de sua armadilha no endereço ${trap.addressStreet}. Envie hoje a fotografia da amostra. Se quiser interromper temporariamente o monitoramento, desative sua armadilha no aplicativo e guarde ou descarte corretamente o material. Para voltar a monitorar no futuro, basta reativá-la no app. Não deixe sua armadilha se transformar em um criadouro!`
       })
