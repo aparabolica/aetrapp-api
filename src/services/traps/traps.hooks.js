@@ -6,6 +6,7 @@ const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-
 const parseDateQuery = require("../../hooks/parse-date-query");
 const errors = require("@feathersjs/errors");
 const dehydrate = require('feathers-sequelize/hooks/dehydrate');
+const Sequelize = require('sequelize');
 
 // Localized moment.js
 const moment = require("moment/min/moment-with-locales");
@@ -83,7 +84,7 @@ const storeBlob = function () {
  * Notification
  */
 
-const removeNotifications = function () {
+const removeFutureNotifications = function () {
   return function (hook) {
     const trap = _.castArray(getItems(hook))[0];
 
@@ -92,7 +93,12 @@ const removeNotifications = function () {
       .service("notifications")
       .find({
         query: {
-          trapId: trap.id
+          payload: {
+            trapId: trap.id
+          },
+          deliveryTime: {
+            [Sequelize.Op.gt]: new Date()
+          }
         },
         paginate: false
       })
@@ -104,7 +110,10 @@ const removeNotifications = function () {
             .then(() => {
               doneItem();
             })
-            .catch(doneItem);
+            .catch(err =>{
+              console.log(`Could not remove notif. ${item.id} due to error: ` + err.message);
+              doneItem();
+            });
         }, (err, results) => {
           if (err) console.log("Error removing future notifications", err);
         });
@@ -127,11 +136,14 @@ const addNotifications = function () {
       .service("notifications")
       .create({
         recipientId: trap.ownerId,
-        type: 'direct',
-        trapId: trap.id,
-        title: "Uma coleta está próxima",
+        payload: {
+          type: 'trap-almost-ready',
+          deeplink: 'trap/' + trap.id,
+          trapId: trap.id
+        },
+        title: "Amanhã é dia de fotografar amostra!",
         deliveryTime: sampleAlmostReadyAt,
-        message: "A armadilha no endereço " + trap.addressStreet + ", estará pronta para coleta no dia " + moment(trap.windowStart).format("DD/MM/YYYY")
+        message: "Não se esqueça, amanhã você deve fotografar a amostra de sua armadilha no endereço " + trap.addressStreet + "."
       })
       .catch(err => {
         console.log('Error creating notification');
@@ -143,11 +155,14 @@ const addNotifications = function () {
       .service("notifications")
       .create({
         recipientId: trap.ownerId,
-        type: 'direct',
-        trapId: trap.id,
-        title: "Uma coleta está pronta",
+        payload: {
+          type: 'trap-is-ready',
+          deeplink: 'trap/' + trap.id,
+          trapId: trap.id
+        },
+        title: "Hoje é dia de fotografar amostra!",
         deliveryTime: moment(trap.windowStart).toDate(),
-        message: "Retire o cartão de amostra da armadilha no endereço " + trap.addressStreet + "."
+        message: "Não se esqueça, hoje é dia de fotografar a amostra, trocar a paleta e higienizar sua armadilha no endereço " + trap.addressStreet + "."
       })
       .catch(err => {
         console.log('Error creating notification');
@@ -272,10 +287,10 @@ module.exports = {
     create: [addNotifications()],
     update: [],
     patch: [
-      iff(hook => { return hook.data && hook.data.isActive == false }, removeNotifications()),
-      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeNotifications(), addNotifications()])
+      iff(hook => { return hook.data && hook.data.isActive == false }, removeFutureNotifications()),
+      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeFutureNotifications(), addNotifications()])
     ],
-    remove: [removeNotifications()]
+    remove: [removeFutureNotifications()]
   },
 
   error: {
