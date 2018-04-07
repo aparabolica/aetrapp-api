@@ -69,7 +69,7 @@ const registerAnalysisJob = function () {
       })
       .catch(err => {
         let errorMessage = "Erro ao solicitar serviço de análise."
-        if (err.code == "ECONNREFUSED") errorMessage = "Serviço de análise não está disponível";
+        if (err.code == "ECONNREFUSED") errorMessage = "O serviço de processamento de imagens está indisponível.";
         samples.patch(hook.result.id, {
           status: "unprocessed",
           error: {
@@ -121,7 +121,11 @@ const startAnalysis = function () {
         return hook;
       })
       .catch(err => {
-        return new errors.GeneralError(err.message);
+        if (err.code == 'ECONNREFUSED') {
+          throw new errors.GeneralError("O serviço de processamento de imagens está indisponível.");
+        } else {
+          throw new errors.GeneralError("Não foi possível completar a ação, por favor, contate o suporte.");
+        }
       })
   }
 }
@@ -145,9 +149,6 @@ const registerAnalysis = function (hook) {
     })
     .then(res => {
       return hook;
-    })
-    .catch(err => {
-      return new errors.InternalError(err.message);
     })
 }
 
@@ -212,11 +213,11 @@ const sampleResolvers = {
       try {
         sample.owner = (await users.get(sample.ownerId, {
           query: {
-            $select: [ 'id', 'firstName', 'lastName' ]
+            $select: ['id', 'firstName', 'lastName']
           }
         }))
       } catch (error) {
-        console.log(`User ${sample.ownerId} not found.`);
+        console.log(`User ${sample.ownerId} not found for sample ${sample.id}.`);
       }
     }
   }
