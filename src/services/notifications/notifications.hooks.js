@@ -1,9 +1,15 @@
-const errors = require("@feathersjs/errors");
-const { authenticate } = require("@feathersjs/authentication").hooks;
-const { restrictToRoles, associateCurrentUser } = require('feathers-authentication-hooks');
-const { iff, isProvider, getItems } = require("feathers-hooks-common");
-const { scheduleNotification, unscheduleNotification } = require('../../helpers/push-notifications');
+// Moment
+const moment = require("moment-timezone");
+moment.tz.setDefault("America/Sao_Paulo");
 
+// Feathers
+const { restrictToRoles, associateCurrentUser } = require('feathers-authentication-hooks');
+const { authenticate } = require("@feathersjs/authentication").hooks;
+const errors = require("@feathersjs/errors");
+const { iff, isProvider, getItems } = require("feathers-hooks-common");
+
+// Helpers
+const { scheduleNotification, unscheduleNotification } = require('../../helpers/push-notifications');
 
 const restrict = [
   iff(isProvider('external'), [
@@ -31,11 +37,22 @@ module.exports = {
 function registerPushNotification() {
   return function (hook) {
     const { recipientId, title, payload, deliveryTime, type } = hook.data;
+
+    // if delivery time exists, always schedule to 8 AM
+    if (deliveryTime) {
+      hook.data.deliveryTime = moment(deliveryTime).hours(8).minutes(0).seconds(0).milliseconds(0);
+
+      // do not set delivery time if event is in the past
+      if (hook.data.deliveryTime.toDate() < Date.now()) {
+        delete hook.data.deliveryTime;
+      }
+    }
+
     return scheduleNotification(
       recipientId,
       title,
       payload,
-      deliveryTime
+      deliveryTime && hook.data.deliveryTime
     ).then(oneSignalId => {
         hook.data.payload = {
           ...hook.data.payload,
