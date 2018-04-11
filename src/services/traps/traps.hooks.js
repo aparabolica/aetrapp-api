@@ -325,6 +325,30 @@ module.exports = {
     create: [addNotifications()],
     update: [],
     patch: [
+      hook => {
+        // Update city if eggCount is passed
+        if (hook.data && (typeof hook.data.eggCount !== "undefined")) {
+          const traps = hook.app.service("traps");
+          const cities = hook.app.service("cities");
+
+          // Load trap to get cityId
+          traps
+            .get(hook.id,
+              {
+                skipResolver: true,
+                query: {
+                  $select: ["cityId"]
+                }
+              })
+            .then(trap => {
+              // Trigger city statistics update
+              cities.patch(trap.cityId, {
+                eggCountAverages: {}
+              });
+            })
+            .catch(err => console.log("Error loading trap to update city statistics", err.message));
+        }
+      },
       iff(hook => { return hook.data && hook.data.isActive == false }, removeFutureNotifications()),
       iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeFutureNotifications(), addNotifications()])
     ],
