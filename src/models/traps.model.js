@@ -11,6 +11,13 @@ module.exports = function (app) {
       primaryKey: true
     },
 
+    eggCount: {
+      type: DataTypes.INTEGER
+    },
+    eggCountDate: {
+      type: DataTypes.DATE
+    },
+
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
