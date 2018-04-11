@@ -14,7 +14,6 @@ const { associateCurrentUser } = require("feathers-authentication-hooks");
 const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
-const dehydrate = require('feathers-sequelize/hooks/dehydrate');
 
 // Helper hooks
 const { doResolver } = require('../../hooks');
@@ -321,8 +320,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
-    get: [dehydrate(), addDelayedStatus(), fastJoin(includeSamplesResolver)],
+    find: [addDelayedStatus(), doResolver(trapResolver)],
+    get: [addDelayedStatus(), doResolver(trapResolver)],
     create: [addNotifications()],
     update: [],
     patch: [
