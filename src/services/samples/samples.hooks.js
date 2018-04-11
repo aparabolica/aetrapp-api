@@ -256,9 +256,29 @@ module.exports = {
     find: [doResolver(sampleResolvers)],
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
-    patch: [iff(
-      hook => { return hook.data && hook.data.status != "analysing" },
-      addNotification())], // ips result
+    patch: [
+      hook => {
+        // if sample has valid count, update trap statitics
+        if (hook.data && hook.data.status == "valid") {
+          const traps = hook.app.service("traps");
+          const samples = hook.app.service("samples");
+
+          // Load sample to get trapId
+          samples
+            .get(hook.id, { skipResolver: true })
+            .then(sample => {
+              traps.patch(sample.trapId, {
+                eggCount: hook.data.eggCount,
+                eggCountDate: sample.updatedAt
+              }, { skipResolver: true })
+            });
+        }
+      },
+      iff(
+        hook => { return hook.data && hook.data.status != "analysing" },
+        addNotification()
+      )
+    ], // ips result
     remove: []
   },
 
