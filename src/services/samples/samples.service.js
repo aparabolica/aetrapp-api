@@ -21,18 +21,28 @@ module.exports = function () {
   app.use("/samples", createService(options));
 
   // Get our initialized service so that we can register hooks and filters
-  const service = app.service("samples");
+  const samplesService = app.service("samples");
 
   app.use("/samples/analysis/:id", (req, res) => {
-    service
-      .patch(null, { ...req.body.results }, { query: { jobId: req.params.id } })
-      .then(() => {
-        res.send("ok");
+
+    // Get sample to patch
+    samplesService
+      .find({ query: { jobId: req.params.id } })
+      .then(samples => {
+        const sample = samples.data[0];
+
+        // Perform patch
+        samplesService
+          .patch(sample.id, { ...req.body.results })
+          .catch(err => {
+            console.log("Error patching sample with analysis result:", err.message);
+          })
+          .finally(() => res.send("ok"));
       })
       .catch(() => {
         res.send("ok");
       });
   });
 
-  service.hooks(hooks);
+  samplesService.hooks(hooks);
 };
