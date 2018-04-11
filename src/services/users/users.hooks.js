@@ -35,14 +35,15 @@ const { findByEmail } = require("../../validations");
 
 const trapResolver = {
   joins: {
-    traps: (...args) => async (user, context) => {
+    trapCount: (...args) => async (user, context) => {
       const traps = context.app.services['traps'];
-      user.traps = (await traps.find({
+      const queryResult = await traps.find({
         query: {
+          $limit: 0,
           ownerId: user.id
         },
-        paginate: false
-      }))
+      })
+      user.trapCount = queryResult.total
     }
   }
 }
@@ -83,7 +84,10 @@ module.exports = {
         discard('password', '_computed', 'verifyExpires', 'resetExpires', 'verifyChanges')
       ),
     ],
-    find: [iff(!isProvider("server"), keep("email"))],
+    find: [
+      iff(!isProvider("server"), keep("email")),
+      iff(isProvider('external'), fastJoin(trapResolver))
+    ],
     get: [iff(isProvider('external'), fastJoin(trapResolver))],
     create: [
       sendVerificationEmail(),
