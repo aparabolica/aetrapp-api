@@ -229,29 +229,39 @@ const parseSortByCity = [
 ];
 
 /*
- * Include samples resolver
+ * Includes resolver
  */
 
-const includeSamplesResolver = {
+const trapResolver = {
   joins: {
-    samples: $select => async (trap, context) => {
+    owner: (...args) => async (trap, context) => {
+      const users = context.app.services['users'];
+      trap.owner = await users.get(trap.ownerId, {
+        skipResolver: true,
+        query: {
+          $select: ['id', 'firstName', 'lastName']
+        }
+      });
+    },
+    lastSampleAndCount: $select => async (trap, context) => {
       const samples = context.app.services['samples'];
-      trap.samples = await samples.find({
+      const queryResult = await samples.find({
+        skipResolver: true,
         query: {
           trapId: trap.id,
           $select: ['id', 'eggCount', 'collectedAt', 'status'],
           $sort: { collectedAt: -1 },
-        },
-        paginate: false
+          $limit: 1
+        }
       });
+      trap.lastSample = queryResult.data[0];
+      trap.sampleCount = queryResult.total;
     },
-    city: (...args) => async (trap, context) => {
+    city: () => async (trap, context) => {
       const cities = context.app.services['cities'];
-      try {
-        trap.city = (await cities.get(trap.cityId))
-      } catch (error) {
-        console.log(`City ${trap.cityId} not found.`);
-      }
+      trap.city = await cities.get(trap.cityId, {
+        skipResolver: true
+      })
     }
   }
 };
