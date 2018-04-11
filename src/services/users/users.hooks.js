@@ -17,8 +17,8 @@ const verifyHooks = require('feathers-authentication-management').hooks;
 const { restrictToRoles } = require("feathers-authentication-hooks");
 const { hashPassword } = require('@feathersjs/authentication-local').hooks;
 
-// Own hooks
-const { setFirstUserToRole, sendVerificationEmail } = require('../../hooks');
+// Helper hooks
+const { setFirstUserToRole, sendVerificationEmail, doResolver } = require('../../hooks');
 
 // General restrict hook
 const restrict = [

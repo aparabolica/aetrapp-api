@@ -19,6 +19,9 @@ const {
 } = require("feathers-authentication-hooks");
 const { iff, isProvider, fastJoin, getItems } = require("feathers-hooks-common");
 
+// Helper hooks
+const { doResolver } = require('../../hooks');
+
 /*
  * Hooks
  */
@@ -206,12 +209,14 @@ const addNotification = function () {
   }
 }
 
+
 const sampleResolvers = {
   joins: {
     owner: (...args) => async (sample, context) => {
       const users = context.app.services['users'];
       try {
         sample.owner = (await users.get(sample.ownerId, {
+          skipResolver: true,
           query: {
             $select: ['id', 'firstName', 'lastName']
           }
@@ -247,8 +252,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [fastJoin(sampleResolvers)],
-    get: [fastJoin(sampleResolvers)],
+    find: [doResolver(sampleResolvers)],
+    find: [doResolver(sampleResolvers)],
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
     patch: [iff(

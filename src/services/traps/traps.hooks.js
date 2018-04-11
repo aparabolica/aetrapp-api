@@ -1,16 +1,24 @@
 const _ = require("lodash");
 const async = require("async");
-const { authenticate } = require("@feathersjs/authentication").hooks;
-const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
-const parseDateQuery = require("../../hooks/parse-date-query");
-const errors = require("@feathersjs/errors");
-const dehydrate = require('feathers-sequelize/hooks/dehydrate');
-const Sequelize = require('sequelize');
 
 // Localized moment.js
 const moment = require("moment/min/moment-with-locales");
 moment.locale("pt-br");
+
+// Helpers
+const parseDateQuery = require("../../hooks/parse-date-query");
+
+// Feathers & Sequelize
+const Sequelize = require('sequelize');
+const { associateCurrentUser } = require("feathers-authentication-hooks");
+const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
+const { authenticate } = require("@feathersjs/authentication").hooks;
+const errors = require("@feathersjs/errors");
+const dehydrate = require('feathers-sequelize/hooks/dehydrate');
+
+// Helper hooks
+const { doResolver } = require('../../hooks');
+
 
 /*
  * Authentication
@@ -110,7 +118,7 @@ const removeFutureNotifications = function () {
             .then(() => {
               doneItem();
             })
-            .catch(err =>{
+            .catch(err => {
               console.log(`Could not remove notif. ${item.id} due to error: ` + err.message);
               doneItem();
             });
