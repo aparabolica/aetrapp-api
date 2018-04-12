@@ -32,8 +32,11 @@ module.exports = function (app) {
     mesoregion: {
       type: DataTypes.STRING
     },
-    eggCountAverages: {
+    eggCountAverage: {
       type: DataTypes.INTEGER
+    },
+    eggCountAverageDate: {
+      type: DataTypes.DATE
     },
     eggCountAverages: {
       type: DataTypes.JSONB

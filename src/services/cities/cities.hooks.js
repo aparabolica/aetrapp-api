@@ -11,8 +11,7 @@ module.exports = {
     patch: [disallow("external"), updateStatics()],
     remove: disallow()
   },
-  after: {
-  }
+  after: {}
 };
 
 function updateStatics() {
@@ -34,7 +33,8 @@ function updateStatics() {
       query: {
         trapId: trapIds.map(trap => trap.id),
         status: 'valid',
-        $select: ['id', 'eggCount', 'collectedAt']
+        $select: ['id', 'eggCount', 'collectedAt'],
+        $sort: { collectedAt: -1 }
       },
       paginate: false
     }));
@@ -54,7 +54,8 @@ function updateStatics() {
     }
 
     hook.data = {
-      eggCountAverages: weeks
+      eggCountAverages: weeks,
+      eggCountAverageDate: moment(validSamples[0]).endOf("isoWeek")
     }
 
     return hook;
