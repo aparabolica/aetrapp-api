@@ -62,6 +62,16 @@ module.exports = function (app) {
       type: DataTypes.BOOLEAN
     },
 
+    // Cached statistics
+    trapCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    delayedTrapCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    }
+
   }, {
     hooks: {
       beforeCount(options) {

@@ -11,13 +11,12 @@ const parseDateQuery = require("../../hooks/parse-date-query");
 // Feathers & Sequelize
 const Sequelize = require('sequelize');
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
+const { disallow, fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
 
 // Helper hooks
-const { doResolver } = require('../../hooks');
-
+const { doResolver, updateUserTrapCount } = require('../../hooks');
 
 /*
  * Authentication
@@ -313,7 +312,7 @@ module.exports = {
       associateCurrentUser({ idField: "id", as: "ownerId" }),
       storeBlob()
     ],
-    update: [...restrict],
+    update: [disallow()],
     patch: [...restrict],
     remove: [...restrict]
   },
@@ -322,7 +321,7 @@ module.exports = {
     all: [],
     find: [addDelayedStatus(), doResolver(trapResolver)],
     get: [addDelayedStatus(), doResolver(trapResolver)],
-    create: [addNotifications()],
+    create: [addNotifications(), updateUserTrapCount()],
     update: [],
     patch: [
       hook => {
@@ -350,9 +349,10 @@ module.exports = {
         }
       },
       iff(hook => { return hook.data && hook.data.isActive == false }, removeFutureNotifications()),
-      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeFutureNotifications(), addNotifications()])
+      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeFutureNotifications(), addNotifications()]),
+      updateUserTrapCount()
     ],
-    remove: [removeFutureNotifications()]
+    remove: [removeFutureNotifications(), updateUserTrapCount()]
   },
 
   error: {
