@@ -8,7 +8,7 @@ const { Op } = Sequelize;
 /*
  * Find traps delayed traps and update their statuses
  */
- module.exports = async app => {
+module.exports = async app => {
 
   const cycleDuration = config.get("cycleDuration");
   const traps = app.service("traps");
@@ -30,7 +30,7 @@ const { Op } = Sequelize;
 
   if (delayedTraps) {
     delayedTraps.forEach(async trap => {
-      await traps.patch(trap.id, { addressComplement: 'delayed' });
+      await traps.patch(trap.id, { status: 'delayed' });
     });
   }
 }
