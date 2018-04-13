@@ -33,7 +33,7 @@ module.exports = function (app) {
       type: DataTypes.STRING
     },
     eggCountAverage: {
-      type: DataTypes.INTEGER
+      type: DataTypes.FLOAT
     },
     eggCountAverageDate: {
       type: DataTypes.DATE
