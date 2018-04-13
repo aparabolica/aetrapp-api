@@ -1,7 +1,8 @@
 module.exports = {
+  doResolver: require('./do-resolver'),
   sendVerificationEmail: require('./send-verification-email.js'),
   setFirstUserToRole: require('./set-first-user-to-role'),
-  doResolver: require('./do-resolver')
+  updateUserTrapCount: require('./update-user-trap-count'),
 }
 
 

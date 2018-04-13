@@ -11,6 +11,11 @@ module.exports = function (app) {
       primaryKey: true
     },
 
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'first-sample'
+    },
+
     eggCount: {
       type: DataTypes.INTEGER
     },
