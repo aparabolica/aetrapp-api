@@ -1,12 +1,17 @@
 module.exports = () => {
   return async context => {
-
     const traps = context.app.service("traps");
+    const users = context.app.service("users");
 
-    const trap = await traps.get(context.id, {
-      skipResolver: true
-    });
+    // load trap if not available
+    let { trap } = context;
+    if (!trap) {
+      trap = await traps.get(context.id, {
+        skipResolver: true
+      });
+    }
 
+    // get users' traps count
     const trapCount = await traps.find({
       skipResolver: true,
       query: {
@@ -15,6 +20,7 @@ module.exports = () => {
       }
     })
 
+    // get users' delayed traps count
     const delayedTrapCount = await traps.find({
       skipResolver: true,
       query: {
@@ -24,12 +30,10 @@ module.exports = () => {
       }
     })
 
-    const users = context.app.service("users");
-
+    // update users' trap counts
     users.patch(trap.ownerId, {
       trapCount: trapCount.total,
       delayedTrapCount: delayedTrapCount.total
     })
-
   };
 };
