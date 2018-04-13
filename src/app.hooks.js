@@ -1,5 +1,6 @@
 // Application hooks that run for every service
 const logger = require('./hooks/logger');
+const { iff, isProvider } = require('feathers-hooks-common');
 
 module.exports = {
   before: {
@@ -13,7 +14,7 @@ module.exports = {
   },
 
   after: {
-    all: [ logger() ],
+    all: [iff(isProvider('external'), logger())],
     find: [],
     get: [],
     create: [],
@@ -23,7 +24,7 @@ module.exports = {
   },
 
   error: {
-    all: [ logger() ],
+    all: [logger()],
     find: [],
     get: [],
     create: [],
