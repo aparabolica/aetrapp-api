@@ -257,18 +257,39 @@ module.exports = {
     create: [registerAnalysisJob(), removeSameDayDuplicates()],
     update: [],
     patch: [
-      hook => {
+      async context => {
+
+        const traps = context.app.service("traps");
+        const samples = context.app.service("samples");
+        const cities = context.app.service("cities");
+
+        // load sample if not available
+        let { sample } = context;
+        if (!sample) {
+          const samples = context.app.service("samples");
+          sample = await samples.get(context.id, {
+            skipResolver: true
+          });
+        }
+
+        // load trap if not available
+        let { trap } = context;
+        if (!trap) {
+          const traps = context.app.service("traps");
+          trap = await traps.get(sample.trapId, {
+            skipResolver: true
+          });
+        }
+
         // if sample has valid count, update trap statitics
-        if (hook.data && hook.data.status == "valid") {
-          const traps = hook.app.service("traps");
-          const samples = hook.app.service("samples");
+        if (context.data && context.data.status == "valid") {
 
           // Load sample to get trapId
           samples
-            .get(hook.id, { skipResolver: true })
+            .get(context.id, { skipResolver: true })
             .then(sample => {
               traps.patch(sample.trapId, {
-                eggCount: hook.data.eggCount,
+                eggCount: context.data.eggCount,
                 eggCountDate: sample.updatedAt
               }, { skipResolver: true })
             });
