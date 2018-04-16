@@ -5,6 +5,9 @@ module.exports = {
 
   // traps
   updateUserTrapCount: require('./traps/update-user-trap-count'),
+  setActiveTrapStatus: require('./traps/set-active-trap-status'),
+  setCycleDates: require('./traps/set-cycle-dates'),
+
   // cities
   updateCityStatistics: require('./cities/update-city-statistics'),
 }

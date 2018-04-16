@@ -16,54 +16,43 @@ const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
 
 // Helper hooks
-const { doResolver, updateUserTrapCount } = require('../../hooks');
+const { doResolver, updateUserTrapCount, setActiveTrapStatus, setCycleDates } = require('../../hooks');
 
 /*
  * Authentication
  */
 
-const loadTrap = function () {
-  return function (hook) {
-    return hook.app
-      .service("traps")
-      .get(hook.id)
-      .then(trap => {
-        if (trap) {
-          hook.trap = trap;
-          return hook;
-        }
-        else new errors.BadRequest("Could not find trap.");
-      })
-      .catch(err => {
-        return new errors.GeneralError("Internal error.");
-      });
-  };
-};
-
 const restrict = [
   iff(isProvider('external'), [
     authenticate("jwt"),
-    loadTrap(),
-    function (hook) {
-      const { trap } = hook;
-      const { id, roles } = hook.params.user;
+    async function (context) {
+      const { id, roles } = context.params.user;
+
+      // load trap if not available
+      let { trap } = context;
+      if (!trap) {
+        const traps = context.app.service("traps");
+        trap = await traps.get(context.id, {
+          skipResolver: true
+        });
+      }
 
       // user is the owner?
-      if (trap.ownerId == id) return hook;
+      if (trap.ownerId == id) return context;
 
       // user is admin?
-      if (roles.includes['admin']) return hook;
+      if (roles.includes['admin']) return context;
 
       // user is a city moderator?
       if (!roles.includes['moderator']) throw new errors.Forbidden("User is not allowed to change this trap.");
       else
-        return hook.app.get("sequelizeClient")
+        return context.app.get("sequelizeClient")
           .users
           .findById(id)
           .then(function (user) {
             return user.hasCity(trap.cityId).then(result => {
               if (result)
-                return hook;
+                return context;
               else
                 throw new errors.Forbidden("User is not allowed to change this trap.");
             });
@@ -134,6 +123,7 @@ const removeFutureNotifications = function () {
 const addNotifications = function () {
   return function (hook) {
     const trap = _.castArray(getItems(hook))[0];
+
     trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days');
 
     // sample window is near notification
@@ -178,22 +168,22 @@ const addNotifications = function () {
     // sample window has finished
     for (let i = 0; i < 7; i++) {
       hook.app
-      .service("notifications")
-      .create({
-        recipientId: trap.ownerId,
-        payload: {
-          type: 'trap-must-be-discarded',
-          deeplink: 'trap/' + trap.id,
-          trapId: trap.id
-        },
-        title: "A armadilha está vencida, desative-a ou inicie novo ciclo!",
-        deliveryTime: moment(trap.cycleStart).add(trap.cycleDuration + i, 'days'),
-        message: `Você não realizou a manutenção semanal de sua armadilha no endereço ${trap.addressStreet}. Envie hoje a fotografia da amostra. Se quiser interromper temporariamente o monitoramento, desative sua armadilha no aplicativo e guarde ou descarte corretamente o material. Para voltar a monitorar no futuro, basta reativá-la no app. Não deixe sua armadilha se transformar em um criadouro!`
-      })
-      .catch(err => {
-        console.log('Error creating notification');
-        console.log(err);
-      });
+        .service("notifications")
+        .create({
+          recipientId: trap.ownerId,
+          payload: {
+            type: 'trap-must-be-discarded',
+            deeplink: 'trap/' + trap.id,
+            trapId: trap.id
+          },
+          title: "A armadilha está vencida, desative-a ou inicie novo ciclo!",
+          deliveryTime: moment(trap.cycleStart).add(trap.cycleDuration + i, 'days'),
+          message: `Você não realizou a manutenção semanal de sua armadilha no endereço ${trap.addressStreet}. Envie hoje a fotografia da amostra. Se quiser interromper temporariamente o monitoramento, desative sua armadilha no aplicativo e guarde ou descarte corretamente o material. Para voltar a monitorar no futuro, basta reativá-la no app. Não deixe sua armadilha se transformar em um criadouro!`
+        })
+        .catch(err => {
+          console.log('Error creating notification');
+          console.log(err);
+        });
     }
   }
 }
@@ -265,36 +255,6 @@ const trapResolver = {
 };
 
 /*
- * addDelayedStatus
- */
-
-function addDelayedStatus() {
-  function setDelayedStatus(trap) {
-    trap.windowStart = moment(trap.cycleStart).add(trap.cycleDuration - 1, 'days').toDate();
-    const now = new Date();
-    if (trap.isActive && trap.windowStart.getTime() < now.getTime()) {
-      trap.isDelayed = true;
-    } else {
-      trap.isDelayed = false;
-    }
-    return trap;
-  }
-
-  return function (hook) {
-    let traps = getItems(hook);
-    if (!Array.isArray(traps)) {
-      traps = setDelayedStatus(traps);
-    } else {
-      traps = traps.map(trap => {
-        return setDelayedStatus(trap);
-      });
-    }
-    replaceItems(hook, traps);
-    return hook;
-  }
-}
-
-/*
  * The hooks
  */
 
@@ -313,43 +273,56 @@ module.exports = {
       storeBlob()
     ],
     update: [disallow()],
-    patch: [...restrict],
+    patch: [
+      ...restrict,
+      iff(isProvider('external'),
+        iff(
+          hook => { return hook.data && hook.data.status == 'active' },
+          setCycleDates(),
+        )
+      ),
+      setActiveTrapStatus()
+    ],
     remove: [...restrict]
   },
 
   after: {
     all: [],
-    find: [addDelayedStatus(), doResolver(trapResolver)],
-    get: [addDelayedStatus(), doResolver(trapResolver)],
-    create: [addNotifications(), updateUserTrapCount()],
+    find: [doResolver(trapResolver)],
+    get: [doResolver(trapResolver)],
+    create: [
+      addNotifications(),
+      updateUserTrapCount()
+    ],
     update: [],
     patch: [
-      hook => {
+      async context => {
         // Update city if eggCount is passed
-        if (hook.data && (typeof hook.data.eggCount !== "undefined")) {
-          const traps = hook.app.service("traps");
-          const cities = hook.app.service("cities");
+        if (context.data && (typeof context.data.eggCount !== "undefined")) {
+          const traps = context.app.service("traps");
+          const cities = context.app.service("cities");
 
-          // Load trap to get cityId
-          traps
-            .get(hook.id,
-              {
-                skipResolver: true,
-                query: {
-                  $select: ["cityId"]
-                }
-              })
-            .then(trap => {
-              // Trigger city statistics update
-              cities.patch(trap.cityId, {
-                eggCountAverages: {}
-              });
-            })
-            .catch(err => console.log("Error loading trap to update city statistics", err.message));
+          // load trap if not available
+          let { trap } = context;
+          if (!trap) {
+            const traps = context.app.service("traps");
+            trap = await traps.get(sample.trapId, {
+              skipResolver: true
+            });
+          }
+
+          // trigger city update
+          cities.patch(trap.cityId, { eggCountAverage: true });
         }
       },
-      iff(hook => { return hook.data && hook.data.isActive == false }, removeFutureNotifications()),
-      iff(hook => { return hook.data && (hook.data.cycleStart || hook.data.isActive) }, [removeFutureNotifications(), addNotifications()]),
+      iff(isProvider('external'),
+        iff(hook => { return hook.data && hook.data.status == 'inactive' },
+          removeFutureNotifications()
+        ).else(
+          removeFutureNotifications(),
+          addNotifications()
+        )
+      ),
       updateUserTrapCount()
     ],
     remove: [removeFutureNotifications(), updateUserTrapCount()]
