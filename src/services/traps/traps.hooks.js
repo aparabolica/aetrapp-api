@@ -306,7 +306,7 @@ module.exports = {
           let { trap } = context;
           if (!trap) {
             const traps = context.app.service("traps");
-            trap = await traps.get(sample.trapId, {
+            trap = await traps.get(context.id, {
               skipResolver: true
             });
           }
