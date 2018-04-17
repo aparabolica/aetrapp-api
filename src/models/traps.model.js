@@ -13,7 +13,7 @@ module.exports = function (app) {
 
     status: {
       type: DataTypes.STRING,
-      defaultValue: 'first-sample'
+      defaultValue: 'waiting-sample'
     },
 
     eggCount: {
