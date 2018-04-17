@@ -25,6 +25,7 @@ module.exports = (app, options) => {
       const ids = req.body.ids.map(id => id);
       service
         .find({
+          skipResolver: true,
           paginate: false,
           query: {
             $select: ["id"],
