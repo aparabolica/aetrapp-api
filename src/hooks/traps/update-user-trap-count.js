@@ -1,10 +1,12 @@
+const { getItems } = require("feathers-hooks-common");
+
 module.exports = () => {
   return async context => {
     const traps = context.app.service("traps");
     const users = context.app.service("users");
 
     // load trap if not available
-    let { trap } = context;
+    let trap = getItems(context);
     if (!trap) {
       trap = await traps.get(context.id, {
         skipResolver: true
