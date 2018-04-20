@@ -16,7 +16,14 @@ const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
 
 // Helper hooks
-const { doResolver, updateUserTrapCount, setActiveTrapStatus, setCycleDates } = require('../../hooks');
+const {
+  doResolver,
+  parseFormatParam,
+  updateUserTrapCount,
+  setActiveTrapStatus,
+  setCycleDates,
+  generateTrapsCSV
+} = require('../../hooks');
 
 /*
  * Authentication
@@ -264,7 +271,8 @@ module.exports = {
     find: [
       ...parseSortByCity,
       parseDateQuery("createdAt"),
-      parseDateQuery("updatedAt")
+      parseDateQuery("updatedAt"),
+      iff(isProvider('external'), parseFormatParam)
     ],
     get: [],
     create: [
@@ -288,7 +296,10 @@ module.exports = {
 
   after: {
     all: [],
-    find: [doResolver(trapResolver)],
+    find: [
+      doResolver(trapResolver),
+      iff(isProvider('external'), generateTrapsCSV())
+    ],
     get: [doResolver(trapResolver)],
     create: [
       addNotifications(),
