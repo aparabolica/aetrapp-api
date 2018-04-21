@@ -16,14 +16,15 @@ const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
 
 // Helper hooks
+const { doResolver, parseFormatParam, } = require('../../hooks');
 const {
-  doResolver,
-  parseFormatParam,
   updateUserTrapCount,
   setActiveTrapStatus,
-  setCycleDates,
-  generateTrapsCSV
-} = require('../../hooks');
+  generateTrapsCSV,
+  parseSortByCity,
+  setCycleDates
+} = require('../../hooks/traps');
+
 
 /*
  * Authentication
@@ -196,34 +197,6 @@ const addNotifications = function () {
 }
 
 /*
- * Parse sort by city
- */
-
-const sortByCity = function () {
-  return function (hook) {
-    const { query } = hook.params;
-    const City = hook.app.services.cities.Model;
-    const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
-
-    hook.params.sequelize = {
-      raw: false,
-      include: [{ model: City, attributes: ['id', 'stateId', 'name'] }],
-      order: [[City, 'stateId', sortOrder], [City, 'name', sortOrder]]
-    }
-
-    delete query.$sort['city'];
-    return hook;
-  }
-}
-
-const parseSortByCity = [
-  iff(hook => {
-    const { query } = hook.params;
-    return query && query.$sort && query.$sort['city'];
-  }, sortByCity()),
-];
-
-/*
  * Includes resolver
  */
 
@@ -269,7 +242,7 @@ module.exports = {
   before: {
     all: [],
     find: [
-      ...parseSortByCity,
+      parseSortByCity(),
       parseDateQuery("createdAt"),
       parseDateQuery("updatedAt"),
       iff(isProvider('external'), parseFormatParam)
