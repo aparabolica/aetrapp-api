@@ -152,61 +152,54 @@ module.exports = function () {
     curl 'http://localhost:3030/downloads/users.csv' -H 'Authorization: <token>'
 
   */
-  app.use("/downloads/users.csv", authenticate('jwt'), function (req, res) {
+  app.use("/downloads/users.csv", authenticate('jwt'), async function (req, res) {
 
     // check if user is admin
-    if (!req.user.roles.includes('admin')) {
-      res.status(401).send({ error: 'User must have admin role.' });
+    if (!req.user.roles.includes('admin'))
+      return res.status(401).send({ error: 'User must have admin role.' });
+
+
+    try {
+      const usersService = app.service('samples');
+
+      let items = await usersService.find({ query: req.query || {}, paginate: false, skipResolver: true });
+
+      // prepare items
+      items = _.map(items, item => {
+
+        // list of properties allowed, to avoid exposing unwanted fields
+        item = _.pick(item, [
+          'id',
+          'email',
+          'landlineNumber',
+          'cellphoneNumber',
+          'firstName',
+          'lastName',
+          'dateOfBirth',
+          'gender',
+          'roles',
+          'isActive',
+          'isVerified',
+          'createdAt',
+          'updatedAt',
+        ]);
+
+        // parse dates
+        item.createdAt = moment(item.createdAt).tz("Brazil/East").format();
+        item.updatedAt = moment(item.updatedAt).tz("Brazil/East").format();
+        item.dateOfBirth = item.dateOfBirth && moment(item.dateOfBirth).format("YYYY-MM-DD");
+
+        return item;
+      })
+
+      const csvString = csvStringify(items, { header: true });
+
+      res.set('Content-disposition', 'attachment; filename=users.csv');
+      res.set('Content-type', 'text/csv');
+      res.send(csvString);
+
+    } catch (error) {
+      return res.status(500).send({ error: 'Error generating csv file.' });
     }
-
-    var results = [[
-      'id',
-      'email',
-      'landlineNumber',
-      'cellphoneNumber',
-      'firstName',
-      'lastName',
-      'dateOfBirth',
-      'gender',
-      'roles',
-      'isActive',
-      'isVerified',
-      'createdAt',
-      'updatedAt',
-      'lastSignedInAt',
-    ]];
-    var query = "SELECT * FROM users ORDER BY \"createdAt\" ASC";
-    sequelizeClient.query(query)
-      .then(function (queryResult) {
-        queryResult[0].forEach(function (item) {
-          results.push([
-            item.id,
-            item.email,
-            item.landlineNumber,
-            item.cellphoneNumber,
-            item.firstName,
-            item.lastName,
-            item.dateOfBirth,
-            item.gender,
-            item.roles,
-            item.isActive,
-            item.isVerified,
-            item.createdAt && moment(item.createdAt).tz("Brazil/East").format(),
-            item.updatedAt && moment(item.updatedAt).tz("Brazil/East").format(),
-            item.lastSignedInAt && moment(item.lastSignedInAt).tz("Brazil/East").format(),
-          ]);
-        });
-        csvStringify(results, function (err, csv) {
-          if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-          else {
-            res.set('Content-disposition', 'attachment; filename=users.csv');
-            res.set('Content-type', 'text/csv');
-            res.send(csv);
-          }
-        });
-      }).catch(function (err) {
-        if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-      });
   });
-
 };
