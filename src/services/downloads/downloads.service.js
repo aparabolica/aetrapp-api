@@ -1,68 +1,89 @@
-const config = require('config');
-const moment = require('moment-timezone');
-const csvStringify = require('csv-stringify');
+const _ = require("lodash");
 
+// moment
+const moment = require("moment-timezone");
+
+// csv
+const csvStringify = require('csv-stringify/lib/sync');
+
+// config
+const config = require("config");
+const apiUrl = config.get('apiUrl');
+
+// authentication
 const { authenticate } = require('@feathersjs/authentication').express;
 
 module.exports = function () {
   const app = this;
 
-  const apiUrl = config.get('apiUrl');
+  app.get("/downloads/traps.csv", async function (req, res) {
 
-  const sequelizeClient = app.get('sequelizeClient');
+    try {
+      const trapsService = app.service('traps');
 
-  app.get("/downloads/traps.csv", function (req, res) {
-    var results = [[
-      'id',
-      'lon',
-      'lat',
-      'addressStreet',
-      'addressComplement',
-      'neighborhood',
-      'postcode',
-      'cityId',
-      'stateId',
-      'createdAt',
-      'updatedAt',
-      'isActive',
-      'cycleDuration',
-      'cycleStart',
-      'imageUrl'
-    ]];
-    var query = "SELECT * FROM traps ORDER BY \"createdAt\" ASC";
-    sequelizeClient.query(query)
-      .then(function (queryResult) {
-        queryResult[0].forEach(function (item) {
-          var time = moment(item.createdAt);
-          results.push([
-            item.id,
-            item.coordinates.coordinates[0],
-            item.coordinates.coordinates[1],
-            item.addressStreet,
-            item.addressComplement,
-            item.neighborhood,
-            item.postcode,
-            item.cityId,
-            item.stateId,
-            moment(item.createdAt).tz("Brazil/East").format(),
-            moment(item.updatedAt).tz("Brazil/East").format(),
-            item.isActive ? 1 : 0,
-            item.cycleDuration,
-            moment(item.cycleStart).tz("Brazil/East").format(),
-            item.imageId && (apiUrl + '/files/' + item.imageId),
-          ]);
-        });
-        csvStringify(results, function (err, csv) {
-          if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-          else {
-            res.set('Content-disposition', 'attachment; filename=traps.csv');
-            res.set('Content-type', 'text/csv');
-            res.send(csv);
-          }
-        });
-      }).catch(function (err) {
-        if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-      });
+      let items = await trapsService.find({ query: req.query || {}, paginate: false });
+
+      // prepare items
+      items = _.map(items, item => {
+
+        // list of properties allowed, to avoid exposing unwanted fields
+        item = _.pick(item, [
+          "id",
+          "status",
+          "eggCount",
+          "eggCountDate",
+          "isActive",
+          "coordinates",
+          "cycleDuration",
+          "addressStreet",
+          "addressComplement",
+          "neighborhood",
+          "postcode",
+          "cityId",
+          "stateId",
+          "ownerId",
+          "createdAt",
+          "updatedAt",
+          "cycleStart",
+          "city",
+          "sampleCount",
+          "imageId"
+        ]);
+
+        // set image URL
+        if (item.imageId) {
+          item.imageUrl = apiUrl + '/files/' + item.imageId;
+          delete item.imageId;
+        }
+
+        // parse dates
+        if (item.eggCountDate) {
+          item.eggCountDate = moment(item.eggCountDate).tz("Brazil/East").format();
+        }
+        item.createdAt = moment(item.createdAt).tz("Brazil/East").format();
+        item.updatedAt = moment(item.updatedAt).tz("Brazil/East").format();
+        item.cycleStart = moment(item.cycleStart).tz("Brazil/East").format();
+
+        // transform geometry
+        item.lon = item.coordinates.coordinates[0];
+        item.lat = item.coordinates.coordinates[1];
+        delete item.coordinates;
+
+        item.stateId = item.city && item.city.stateId;
+        item.city = item.city.name;
+
+        return item;
+      })
+
+      const csvString = csvStringify(items, { header: true });
+
+      res.set('Content-disposition', 'attachment; filename=traps.csv');
+      res.set('Content-type', 'text/csv');
+      res.send(csvString);
+
+    } catch (error) {
+      return res.status(500).send({ error: 'Error generating csv file.' });
+    }
   });
 
   app.get("/downloads/samples.csv", function (req, res) {
@@ -180,4 +201,5 @@ module.exports = function () {
         if (err) return res.status(500).send({ error: 'Error generating csv file.' });
       });
   });
+
 };

@@ -20,7 +20,6 @@ const { doResolver, parseFormatParam, } = require('../../hooks');
 const {
   updateUserTrapCount,
   setActiveTrapStatus,
-  generateTrapsCSV,
   parseSortByCity,
   setCycleDates
 } = require('../../hooks/traps');
@@ -270,8 +269,7 @@ module.exports = {
   after: {
     all: [],
     find: [
-      doResolver(trapResolver),
-      iff(isProvider('external'), generateTrapsCSV())
+      doResolver(trapResolver)
     ],
     get: [doResolver(trapResolver)],
     create: [
