@@ -42,10 +42,8 @@ module.exports = () => {
         // if so, set trap status as a comparison to city average
         if (trap.eggCount > city.eggCountAverage) {
           context.data.status = 'above-average';
-        } else if (trap.eggCount < city.eggCountAverage) {
+        } else if (trap.eggCount <= city.eggCountAverage) {
           context.data.status = 'bellow-average';
-        } else if (trap.eggCount == city.eggCountAverage) {
-          context.data.status = 'on-average';
         }
       } else { // otherwise, set "wait for sample" status
         context.data.status = 'waiting-sample';
