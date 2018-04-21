@@ -86,51 +86,58 @@ module.exports = function () {
     }
   });
 
-  app.get("/downloads/samples.csv", function (req, res) {
-    var results = [[
-      'id',
-      'trapId',
-      'status',
-      'eggCount',
-      'errorCode',
-      'errorMessage',
-      'createdAt',
-      'updatedAt',
-      'collectedAt',
-      'analysisStartedAt',
-      'analysisFinishedAt',
-      'imageUrl',
-    ]];
-    var query = "SELECT * FROM samples ORDER BY \"createdAt\" ASC";
-    sequelizeClient.query(query)
-      .then(function (queryResult) {
-        queryResult[0].forEach(function (item) {
-          results.push([
-            item.id,
-            item.trapId,
-            item.status,
-            item.eggCount,
-            item.error && item.error.code,
-            item.error && item.error.message,
-            item.createdAt && moment(item.createdAt).tz("Brazil/East").format(),
-            item.updatedAt && moment(item.updatedAt).tz("Brazil/East").format(),
-            item.collectedAt && moment(item.collectedAt).tz("Brazil/East").format(),
-            item.analysisStartedAt && moment(item.analysisStartedAt).tz("Brazil/East").format(),
-            item.analysisFinishedAt && moment(item.analysisFinishedAt).tz("Brazil/East").format(),
-            item.blobId && (apiUrl + '/files/' + item.blobId),
-          ]);
-        });
-        csvStringify(results, function (err, csv) {
-          if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-          else {
-            res.set('Content-disposition', 'attachment; filename=samples.csv');
-            res.set('Content-type', 'text/csv');
-            res.send(csv);
-          }
-        });
-      }).catch(function (err) {
-        if (err) return res.status(500).send({ error: 'Error generating csv file.' });
-      });
+  app.get("/downloads/samples.csv", async function (req, res) {
+
+    try {
+      const samplesService = app.service('samples');
+
+      let items = await samplesService.find({ query: req.query || {}, paginate: false });
+
+      // prepare items
+      items = _.map(items, item => {
+
+        // list of properties allowed, to avoid exposing unwanted fields
+        item = _.pick(item, [
+          'id',
+          'trapId',
+          'status',
+          'eggCount',
+          'errorCode',
+          'errorMessage',
+          'createdAt',
+          'updatedAt',
+          'collectedAt',
+          'analysisStartedAt',
+          'analysisFinishedAt',
+          'blobId'
+        ]);
+
+        // set image URL
+        if (item.imageId) {
+          item.imageUrl = apiUrl + '/files/' + item.imageId;
+          delete item.imageId;
+        }
+
+        // parse dates
+        item.createdAt = moment(item.createdAt).tz("Brazil/East").format();
+        item.updatedAt = moment(item.updatedAt).tz("Brazil/East").format();
+        item.collectedAt = moment(item.collectedAt).tz("Brazil/East").format();
+        item.analysisStartedAt = item.analysisStartedAt && moment(item.analysisStartedAt).tz("Brazil/East").format();
+        item.analysisFinishedAt = item.analysisFinishedAt && moment(item.analysisFinishedAt).tz("Brazil/East").format();
+
+
+        return item;
+      })
+
+      const csvString = csvStringify(items, { header: true });
+
+      res.set('Content-disposition', 'attachment; filename=samples.csv');
+      res.set('Content-type', 'text/csv');
+      res.send(csvString);
+
+    } catch (error) {
+      return res.status(500).send({ error: 'Error generating csv file.' });
+    }
   });
 
 
