@@ -48,10 +48,10 @@ const restrict = [
       if (trap.ownerId == id) return context;
 
       // user is admin?
-      if (roles.includes['admin']) return context;
+      if (roles.includes('admin')) return context;
 
       // user is a city moderator?
-      if (!roles.includes['moderator']) throw new errors.Forbidden("User is not allowed to change this trap.");
+      if (!roles.includes('moderator')) throw new errors.Forbidden("User is not allowed to change this trap.");
       else
         return context.app.get("sequelizeClient")
           .users
