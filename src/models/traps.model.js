@@ -47,7 +47,7 @@ module.exports = function (app) {
     addressComplement: {
       type: DataTypes.STRING
     },
-    neighborhood: {
+    neighbourhood: {
       type: DataTypes.STRING
     },
     postcode: {

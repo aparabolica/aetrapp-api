@@ -37,7 +37,7 @@ module.exports = function () {
           "cycleDuration",
           "addressStreet",
           "addressComplement",
-          "neighborhood",
+          "neighbourhood",
           "postcode",
           "cityId",
           "stateId",
