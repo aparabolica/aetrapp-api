@@ -14,13 +14,11 @@ module.exports = () => {
       const sortOrder = parseInt(query.$sort['city']) == -1 ? 'DESC' : 'ASC';
 
       context.params.sequelize = {
-        raw: false,
         include: [{ model: City, attributes: ['id', 'stateId', 'name'] }],
         order: [[City, 'stateId', sortOrder], [City, 'name', sortOrder]]
       }
 
       delete query.$sort['city'];
-
     };
 
     return context;
