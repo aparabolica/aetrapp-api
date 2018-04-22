@@ -160,7 +160,7 @@ module.exports = function () {
 
 
     try {
-      const usersService = app.service('samples');
+      const usersService = app.service('users');
 
       let items = await usersService.find({ query: req.query || {}, paginate: false, skipResolver: true });
 
