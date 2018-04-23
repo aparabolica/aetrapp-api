@@ -35,6 +35,9 @@ module.exports = () => {
       paginate: false
     });
 
+    // do not calculate if there are no samples for the city
+    if (!validSamples || validSamples.length == 0) return context;
+
     // get last valid sample week
     const lastValidCountDate = moment(validSamples[0].collectedAt);
 
