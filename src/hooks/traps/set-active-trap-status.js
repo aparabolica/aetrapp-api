@@ -76,14 +76,14 @@ module.exports = () => {
           } else if (validSampleInCycle.eggCount <= cityCountAverage) {
             context.data.status = 'bellow-average';
           }
-        } else {
-          context.data.status = 'waiting-sample';
         }
-
         // init new cycle
         context.data.cycleStart = new Date();
         context.data.cycleDuration = config.get('cycleDuration');
       }
+
+      if (context.data && context.data.status && context.data.status == 'active') context.data.status = 'waiting-sample';
+
     }
 
     return context;
