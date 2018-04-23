@@ -36,9 +36,6 @@ module.exports = () => {
     // trap will be active or a new sample fired an status update
     if ((data && data.status && data.status == 'active') || (trap.status != 'inactive')) {
 
-      // default status
-      context.data.status = 'waiting-sample';
-
       // check if a valid sample exists in current cycle
       let validSampleInCycle = await samples.find({
         query: {
@@ -79,6 +76,8 @@ module.exports = () => {
           } else if (validSampleInCycle.eggCount <= cityCountAverage) {
             context.data.status = 'bellow-average';
           }
+        } else {
+          context.data.status = 'waiting-sample';
         }
 
         // init new cycle
