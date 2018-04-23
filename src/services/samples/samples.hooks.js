@@ -288,10 +288,7 @@ module.exports = {
           samples
             .get(context.id, { skipResolver: true })
             .then(sample => {
-              traps.patch(sample.trapId, {
-                eggCount: context.data.eggCount,
-                eggCountDate: sample.updatedAt
-              }, { skipResolver: true })
+              traps.patch(sample.trapId, {}, { skipResolver: true })
             });
         }
       },

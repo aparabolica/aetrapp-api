@@ -28,7 +28,7 @@ module.exports = async app => {
     paginate: false
   })
 
-  if (delayedTraps) {
+  if (delayedTraps && delayedTraps.length > 0) {
     delayedTraps.forEach(async trap => {
       await traps.patch(trap.id, { status: 'delayed' });
     });
