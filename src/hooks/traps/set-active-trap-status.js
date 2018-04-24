@@ -73,7 +73,7 @@ module.exports = () => {
           if (recentValidSample.eggCount > cityCountAverage) {
             context.data.status = 'above-average';
           } else if (recentValidSample.eggCount <= cityCountAverage) {
-            context.data.status = 'bellow-average';
+            context.data.status = 'below-average';
           }
         } else {
           context.data.status = 'waiting-sample';
