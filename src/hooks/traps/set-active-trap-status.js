@@ -36,13 +36,13 @@ module.exports = () => {
     // trap will be active or a new sample fired an status update
     if ((data && data.status && data.status == 'active') || (trap.status != 'inactive')) {
 
-      // check if a valid sample exists in current cycle
-      let validSampleInCycle = await samples.find({
+      // check if a valid sample exists in last week
+      const aWeekAgo = moment().subtract(7, 'days').toDate();
+      let recentValidSample = await samples.find({
         query: {
           trapId: trap.id,
           collectedAt: {
-            [Op.gte]: trap.cycleStart,
-            [Op.lte]: moment(trap.cycleStart).add(trap.cycleDuration + 1, 'days').toDate()
+            [Op.gte]: aWeekAgo
           },
           status: 'valid',
           $limit: 1,
@@ -54,28 +54,29 @@ module.exports = () => {
       });
 
       // if there is a recent sample
-      if (validSampleInCycle && validSampleInCycle.length > 0) {
-        validSampleInCycle = validSampleInCycle[0];
+      if (recentValidSample && recentValidSample.length > 0 && city.eggCountAverageDate) {
+        recentValidSample = recentValidSample[0];
 
-        const aWeekAgo = moment().subtract(7, 'days').toDate();
+        const sampleAge = moment(recentValidSample.collectedAt).diff(city.eggCountAverageDate, 'days');
 
         let cityCountAverage;
-        if (city.eggCountAverageDate && city.eggCountAverageDate >= aWeekAgo) {
+        if (sampleAge <= 7) {
           cityCountAverage = city.eggCountAverage;
         }
 
         // set status
-        if (validSampleInCycle.eggCount == 0) {
+        if (recentValidSample.eggCount == 0) {
           context.data.status = 'no-eggs';
-
           // if city has recent count, set status as comparison
         } else if (typeof cityCountAverage != undefined) {
           // if so, set trap status as a comparison to city average
-          if (validSampleInCycle.eggCount > cityCountAverage) {
+          if (recentValidSample.eggCount > cityCountAverage) {
             context.data.status = 'above-average';
-          } else if (validSampleInCycle.eggCount <= cityCountAverage) {
+          } else if (recentValidSample.eggCount <= cityCountAverage) {
             context.data.status = 'bellow-average';
           }
+        } else {
+          context.data.status = 'waiting-sample';
         }
         // init new cycle
         context.data.cycleStart = new Date();
