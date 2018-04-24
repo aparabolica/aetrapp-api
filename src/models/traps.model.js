@@ -1,3 +1,4 @@
+const config = require('config');
 const Sequelize = require('sequelize');
 const DataTypes = Sequelize.DataTypes;
 const generateId = require('../helpers/generate-id');
@@ -30,7 +31,7 @@ module.exports = function (app) {
 
     cycleDuration: { // in days
       type: DataTypes.FLOAT,
-      defaultValue: 2
+      defaultValue: config.get('cycleDuration')
     },
 
     imageId: {
