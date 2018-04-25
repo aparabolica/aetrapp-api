@@ -1,6 +1,14 @@
 {
   "siteUrl": "http://localhost:3030",
   "ipsUrl": "http://localhost:3131",
+  "sequelize": {
+    "dialect": "postgresql",
+    "host": "postgres",
+    "database": "aetrapp",
+    "username": "aetrapp",
+    "password": "aetrapp",
+    "port": 5432
+  },
   "host": "localhost",
   "port": 3030,
   "public": "../public/",
