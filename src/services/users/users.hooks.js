@@ -85,7 +85,10 @@ module.exports = {
     ],
     find: [
       // do not expose user data if user is not logged
-      iff(hook => !hook.params.user, [keep("email")])
+      iff(
+        isProvider('external'),
+        iff(hook => !hook.params.user, [keep("email")])
+      )
     ],
     get: [iff(isProvider('external'), fastJoin(trapResolver))],
     create: [
