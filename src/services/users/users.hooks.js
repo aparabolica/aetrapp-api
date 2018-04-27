@@ -3,7 +3,6 @@ const {
   discard,
   disallow,
   fastJoin,
-  pluckQuery,
   preventChanges,
   iff,
   isProvider,
@@ -51,7 +50,7 @@ const trapResolver = {
 module.exports = {
   before: {
     all: [],
-    find: [iff(!isProvider("server"), [pluckQuery("email"), findByEmail])],
+    find: [],
     get: [...restrict],
     create: [
       hashPassword(),
@@ -85,8 +84,8 @@ module.exports = {
       ),
     ],
     find: [
-      iff(!isProvider("server"), keep("email")),
-      iff(isProvider('external'), fastJoin(trapResolver))
+      // do not expose user data if user is not logged
+      iff(hook => !hook.params.user, [keep("email")])
     ],
     get: [iff(isProvider('external'), fastJoin(trapResolver))],
     create: [
