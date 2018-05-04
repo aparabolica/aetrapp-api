@@ -26,7 +26,7 @@
     "build": "webpack --config ./webpack.deployment.config.js --progress --colors",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "mocha": "mocha test/ --recursive --exit",
-    "nodemon": "nodemon src",
+    "dev": "nodemon src",
     "start:webpack": "webpack-dev-server",
     "start": "npm run build && node src",
     "test": "npm run eslint && npm run mocha"
@@ -59,30 +59,15 @@
     "nodemailer-mailgun-transport": "1.3.6",
     "onesignal": "0.1.2",
     "pg": "7.3.0",
-    "pug": "2.0.0-rc.4",
-    "react": "16.2.0",
-    "react-dom": "16.2.0",
+    "pug": "2.0.3",
     "sequelize": "4.35.5",
-    "serve-favicon": "2.4.4",
     "superagent": "3.8.2",
     "winston": "2.3.1"
   },
   "devDependencies": {
-    "babel-cli": "6.26.0",
-    "babel-core": "6.26.0",
-    "babel-loader": "7.1.2",
-    "babel-preset-env": "1.6.1",
-    "babel-preset-react": "6.24.1",
-    "clean-webpack-plugin": "0.1.17",
     "eslint": "4.19.1",
-    "html-webpack-plugin": "2.30.1",
     "mocha": "5.1.1",
     "nodemon": "1.17.3",
-    "react-hot-loader": "3.1.3",
-    "request-promise": "4.2.2",
-    "webpack": "3.10.0",
-    "webpack-dev-middleware": "2.0.1",
-    "webpack-dev-server": "2.9.7",
-    "webpack-hot-middleware": "2.21.0"
+    "request-promise": "4.2.2"
   }
 }
