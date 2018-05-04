@@ -1,0 +1,17 @@
+version: '2'
+services:
+  postgres:
+    image: mdillon/postgis:9.6
+    ports:
+      - 15433:5432
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50k"
+        max-file: "50"
+    volumes:
+      - ./data/test-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=aetrapp
+      - POSTGRES_USER=aetrapp
+      - POSTGRES_PASSWORD=aetrapp

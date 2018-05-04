@@ -1,0 +1,10 @@
+{
+  "sequelize": {
+    "dialect": "postgres",
+    "host": "localhost",
+    "database": "aetrapp",
+    "username": "aetrapp",
+    "password": "aetrapp",
+    "port": 15433
+  }
+}
