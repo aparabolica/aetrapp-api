@@ -37,7 +37,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Static folders
 app.use('/files', express.static(path.join(__dirname, '/../uploads')));
-app.use("/", express.static(path.join(__dirname, "/../dist")));
+
+// Host the public folder
+app.use('/', express.static(app.get('public')));
 
 app.configure(sequelize);
 app.configure(rest());
