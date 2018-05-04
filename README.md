@@ -10,12 +10,6 @@ The easiest way to run the API server locally is using Docker. Install it and ru
 
 It will run migrations and start the service at http://localhost:3030.
 
-## Development & Testing
----
-
-### Start 
-
-
 ## License
 
 [GPL-3.0](LICENSE)
