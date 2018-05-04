@@ -23,11 +23,11 @@ module.exports = function () {
         return models.users
           .findById(userId)
           .then(function (user) {
-            return user.getCities().then(cities=>{
+            return user.getCities().then(cities => {
               resolve(cities);
             }).catch(reject);
           })
-          .catch(function (err) {
+          .catch(() => {
             reject(new errors.NotFound("City not found."));
           });
       });
@@ -43,13 +43,13 @@ module.exports = function () {
           return models.cities
             .findById(cityId)
             .then(function (city) {
-              return city.addMaintainer(userId).then(res => {
+              return city.addMaintainer(userId).then(() => {
                 resolve({});
-              }).catch(err => {
-                reject(new errors.GeneralError(`Association failed. Does user with id="${userId}" exists?`))
+              }).catch(() => {
+                reject(new errors.GeneralError(`Association failed. Does user with id="${userId}" exists?`));
               });
             })
-            .catch(function (err) {
+            .catch(() => {
               reject(new errors.NotFound("City not found."));
             });
         else
@@ -70,14 +70,14 @@ module.exports = function () {
             .then(function (city) {
               return city.removeMaintainer(userId).then(res => {
                 if (res)
-                  resolve({})
+                  resolve({});
                 else
                   reject(new errors.NotFound(`Dissociation failed, does it exist?`));
-              }).catch(err => {
-                reject(new errors.GeneralError("Could not associate maintainer to city."))
+              }).catch(() => {
+                reject(new errors.GeneralError("Could not associate maintainer to city."));
               });
             })
-            .catch(function (err) {
+            .catch(() => {
               reject(new errors.NotFound("City not found."));
             });
         else
