@@ -3,15 +3,26 @@ const Sequelize = require('sequelize');
 
 module.exports = function () {
   const app = this;
-  const { database, username, password, host, dialect } = config.get('sequelize');
-  const sequelize = new Sequelize(database, username, password, {
-    host,
+
+  const {
     dialect,
+    database,
+    host,
+    password,
+    port,
+    username,
+  } = config.get('sequelize');
+
+  const sequelize = new Sequelize(database, username, password, {
+    dialect,
+    host,
+    port,
     logging: false,
     define: {
       freezeTableName: true
     }
   });
+
   const oldSetup = app.setup;
 
   app.set('sequelizeClient', sequelize);

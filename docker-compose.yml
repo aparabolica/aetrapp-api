@@ -34,21 +34,12 @@ services:
       NODE_ENV: development
       NODE_CONFIG: |-
         {
-          "webappUrl": "http://localhost:8000",
-          "apiUrl": "http://localhost:3030",
-          "ipsUrl": "http://localhost:3131",
           "sequelize": {
-            "dialect": "postgresql",
+            "dialect": "postgres",
+            "host": "postgres",
             "database": "aetrapp",
             "username": "aetrapp",
             "password": "aetrapp",
-            "host": "postgres"
-          },
-          "supportEmail": "suporte@aetrapp.org",
-          "mailgun": {
-            "api_key": "<mailgunApiKey>",
-            "api_key": "mailgun api key",
-            "domain": "mg.aetrapp.org",
-            "senderEmail": "Mensageiro do Aetrapp naoresponda@aetrapp.org"
+            "port": 5432
           }
         }
