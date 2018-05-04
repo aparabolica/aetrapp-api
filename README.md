@@ -1,23 +1,20 @@
-## Aetrapp Server
+## AeTrapp API Service 
 
-Data access layer of Aetrapp platform, used by [mobile](github.com/aetrapp/mobile) and [web](github.com/aetrapp/webapp) apps.
+Node.js backend for the AeTrapp platform.
 
-## Development
+## Quick Start
+---
 
-Update `NODE_CONFIG` enviroment varible at `docker-compose.yml` file. It contains a JSON string to change database credentials and other configurations. Then, run:
+The easiest way to run the API server locally is using Docker. Install it and run:
 
-```
-docker-compose up
-```
+    docker-compose up  
 
-## API
+It will run migrations and start the service at http://localhost:3030.
 
-Please refer to [FeathersJS docs](https://docs.feathersjs.com/api/databases/querying.html) to learn how to make queries to the API.
 
-## Changelog
 
-No releases yet.
 
 ## License
+---
 
 [GPL-3.0](LICENSE)
