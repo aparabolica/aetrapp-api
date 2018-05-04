@@ -1,8 +1,6 @@
-const isProd = process.env.NODE_ENV === 'production'
-const path = require('path')
-const returnEmail = process.env.COMPLAINT_EMAIL
+const path = require('path');
 
-const pug = require('pug')
+const pug = require('pug');
 
 module.exports = function (app) {
 

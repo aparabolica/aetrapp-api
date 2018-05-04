@@ -8,5 +8,5 @@ const generate = require('nanoid/generate')
   - https://github.com/ai/nanoid
 */
 module.exports = function () {
-  return generate('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 13)
+  return generate('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 13);
 }

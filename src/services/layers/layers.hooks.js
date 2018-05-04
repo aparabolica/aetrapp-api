@@ -35,7 +35,7 @@ module.exports = {
 
           geojson.features.forEach(feature => {
             properties = feature.properties && _.union(properties, _.keys(feature.properties));
-          })
+          });
 
           context.data.properties = properties;
         }

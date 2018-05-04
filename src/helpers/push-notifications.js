@@ -8,7 +8,7 @@ const defaultHeaders = {
   authorization: 'Basic ' + API_KEY,
   'cache-control': 'no-cache',
   'content-type': 'application/json; charset=utf-8'
-}
+};
 
 module.exports = {
   scheduleNotification: function (userId, message, payload, send_after) {
@@ -46,4 +46,4 @@ module.exports = {
         app_id: APP_ID,
       });
   }
-}
+};
