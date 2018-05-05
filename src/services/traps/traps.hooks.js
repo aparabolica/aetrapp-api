@@ -73,11 +73,16 @@ const restrict = [
  */
 
 const storeBlob = function () {
-  return function (hook) {
-    const blobService = hook.app.service("uploads");
-    return blobService.create({ uri: hook.data.base64 }).then(res => {
-      hook.data.imageId = res.id;
-      return hook;
+  return function (context) {
+    const { data } = context;
+
+    if (!data || !data.base64)
+      throw new errors.BadRequest("Missing trap image.");
+
+    const blobService = context.app.service("uploads");
+    return blobService.create({ uri: context.data.base64 }).then(res => {
+      context.data.imageId = res.id;
+      return context;
     });
   };
 };
