@@ -5,14 +5,11 @@ const auth = require('@feathersjs/authentication-client');
 const superagent = require('superagent');
 const localStorage = require('localstorage-memory');
 
-module.exports = async function (app, user) {
+module.exports = async (app, user) => {
 
   const feathersClient = feathers();
 
-  // create user
-  const usersService = app.service('users');
-  await usersService.create({...user});
-
+  // instanciate feathers client
   feathersClient
     .configure(
       rest('http://localhost:3030')
@@ -20,13 +17,21 @@ module.exports = async function (app, user) {
     )
     .configure(auth({ storage: localStorage }));
 
+  // if credentials are not passed, return unlogged client
+  if (!user) return feathersClient;
+
+  // create user
+  const usersService = app.service('users');
+  await usersService.create({...user});
+
+  // authenticate and return
   return feathersClient
     .authenticate({
       strategy: 'local',
       email: user.email,
       password: user.password
     })
-    .then(response => {
+    .then((response) => {
       return feathersClient.passport.verifyJWT(response.accessToken);
     })
     .then(payload => {
@@ -34,5 +39,6 @@ module.exports = async function (app, user) {
     })
     .then(user => {
       feathersClient.set('user', user);
+      return feathersClient;
     });
 }
