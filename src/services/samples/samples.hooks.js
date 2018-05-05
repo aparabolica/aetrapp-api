@@ -11,16 +11,18 @@ const generateId = require("../../helpers/generate-id");
 // Feathers & Sequelize
 const Sequelize = require("sequelize");
 const errors = require("@feathersjs/errors");
-const fs = require("fs");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const {
   restrictToRoles,
   associateCurrentUser
 } = require("feathers-authentication-hooks");
-const { iff, isProvider, fastJoin, getItems } = require("feathers-hooks-common");
+const { iff, getItems } = require("feathers-hooks-common");
 
 // Helper hooks
 const { doResolver } = require('../../hooks');
+const loadTrap = require('./hooks/load-trap');
+const updateTrapStatus = require('./hooks/update-trap-status');
+
 
 /*
  * Hooks
@@ -49,6 +51,10 @@ const storeBlob = function () {
 // create analysis job
 const registerAnalysisJob = function () {
   return function (hook) {
+
+    // Do not register do IPS while testing
+    if (process.env.NODE_ENV == 'test') return;
+
     const ipsUrl = config.get("ipsUrl") + "/agenda/api/jobs/create";
     const samples = hook.app.service("samples");
     const jobId = generateId();
@@ -63,7 +69,7 @@ const registerAnalysisJob = function () {
           webhookUrl: `${apiUrl}/samples/analysis/${jobId}`
         }
       })
-      .then(res => {
+      .then(() => {
         samples.patch(hook.result.id, {
           status: "analysing",
           error: null,
@@ -80,21 +86,6 @@ const registerAnalysisJob = function () {
             message: errorMessage
           }
         });
-      });
-  };
-};
-
-const checkTrapId = function () {
-  return function (hook) {
-    hook.app
-      .service("traps")
-      .get(hook.data.trapId)
-      .then(trap => {
-        if (trap) return hook;
-        else new errors.BadRequest("Invalid trapId");
-      })
-      .catch(err => {
-        return err;
       });
   };
 };
@@ -235,8 +226,8 @@ module.exports = {
     get: [],
     create: [
       authenticate("jwt"),
-      checkTrapId(),
       associateCurrentUser({ idField: "id", as: "ownerId" }),
+      loadTrap(),
       storeBlob()
     ],
     update: [...restrict],
@@ -253,8 +244,11 @@ module.exports = {
   after: {
     all: [],
     find: [doResolver(sampleResolvers)],
-    find: [doResolver(sampleResolvers)],
-    create: [registerAnalysisJob(), removeSameDayDuplicates()],
+    create: [
+      registerAnalysisJob(),
+      updateTrapStatus('analysing'),
+      removeSameDayDuplicates()
+    ],
     update: [],
     patch: [
       async context => {

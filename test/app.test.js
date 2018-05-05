@@ -20,7 +20,9 @@ describe('Feathers application tests', () => {
 
       // Clear database
       const sequelizeClient = app.get('sequelizeClient');
-      sequelizeClient.query("DELETE FROM USERS;");
+      sequelizeClient.query("DELETE FROM users;");
+      sequelizeClient.query("DELETE FROM traps;");
+      sequelizeClient.query("DELETE FROM samples;");
 
       /*
        * Create user clients
@@ -51,6 +53,7 @@ describe('Feathers application tests', () => {
    */
   require('./public.test.js');
   require('./traps.test.js');
+  require('./samples.test.js');
 
   after(function (done) {
     this.server.close(done);
