@@ -13,7 +13,7 @@ describe('Traps service', () => {
         });
     });
 
-    it('Logged user can create traps', done => {
+    it('Create a trap with logged user', done => {
       const trapService = global.loggedRegularUser1.service('traps');
 
       trapService.create({
