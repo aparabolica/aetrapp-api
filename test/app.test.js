@@ -25,19 +25,21 @@ describe('Feathers application tests', () => {
       /*
        * Create user clients
        */
-      global.adminClient = await UserClientFactory(app, {
+      global.unloggedUser = await UserClientFactory(app).catch(err => { return done(err); });
+
+      global.loggedAdmin = await UserClientFactory(app, {
         firstName: 'Admin',
         lastName: '1',
         email: 'admin@aetrapp.org',
         password: '123456'
-      }).catch(err => { return done(err) });
+      }).catch(err => { return done(err); });
 
-      global.user1Client = await UserClientFactory(app, {
+      global.loggedRegularUser1 = await UserClientFactory(app, {
         firstName: 'User',
         lastName: '1',
         email: 'user1@aetrapp.org',
         password: '123456'
-      }).catch(err => { return done(err) });
+      }).catch(err => { return done(err); });
 
       done();
     });
