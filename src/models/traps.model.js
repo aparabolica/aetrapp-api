@@ -43,7 +43,8 @@ module.exports = function (app) {
       allowNull: false
     },
     addressStreet: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false
     },
     addressComplement: {
       type: DataTypes.STRING
