@@ -50,6 +50,7 @@ describe('Feathers application tests', () => {
    * in the exact order they are declared.
    */
   require('./public.test.js');
+  require('./traps.test.js');
 
   after(function (done) {
     this.server.close(done);
