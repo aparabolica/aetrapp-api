@@ -11,7 +11,7 @@ const parseDateQuery = require("../../hooks/parse-date-query");
 // Feathers & Sequelize
 const Sequelize = require('sequelize');
 const { associateCurrentUser } = require("feathers-authentication-hooks");
-const { disallow, fastJoin, getItems, iff, isProvider, replaceItems } = require("feathers-hooks-common");
+const { disallow, getItems, iff, isProvider } = require("feathers-hooks-common");
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const errors = require("@feathersjs/errors");
 
@@ -63,7 +63,7 @@ const restrict = [
               else
                 throw new errors.Forbidden("User is not allowed to change this trap.");
             });
-          })
+          });
     }
   ])
 ];
@@ -129,8 +129,8 @@ const removeFutureNotifications = function () {
         console.log('Error removing notifications');
         console.log(err);
       });
-  }
-}
+  };
+};
 
 const addNotifications = function () {
   return function (hook) {
@@ -197,8 +197,8 @@ const addNotifications = function () {
           console.log(err);
         });
     }
-  }
-}
+  };
+};
 
 /*
  * Includes resolver
@@ -233,7 +233,7 @@ const trapResolver = {
       const cities = context.app.services['cities'];
       trap.city = await cities.get(trap.cityId, {
         skipResolver: true
-      })
+      });
     }
   }
 };
@@ -261,7 +261,7 @@ module.exports = {
       ...restrict,
       iff(isProvider('external'),
         iff(
-          hook => { return hook.data && hook.data.status == 'active' },
+          hook => { return hook.data && hook.data.status == 'active'; },
           setCycleDates(),
         )
       ),
@@ -302,7 +302,7 @@ module.exports = {
         }
       },
       iff(isProvider('external'),
-        iff(hook => { return hook.data && hook.data.status == 'inactive' },
+        iff(hook => { return hook.data && hook.data.status == 'inactive'; },
           removeFutureNotifications()
         ).else(
           removeFutureNotifications(),

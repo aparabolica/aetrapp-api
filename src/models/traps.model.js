@@ -81,12 +81,12 @@ module.exports = function (app) {
       defaultValue: Date.now
     },
   }, {
-      hooks: {
-        beforeCount(options) {
-          options.raw = true;
-        }
+    hooks: {
+      beforeCount(options) {
+        options.raw = true;
       }
-    });
+    }
+  });
 
   traps.associate = function (models) { // eslint-disable-line no-unused-vars
     traps.belongsTo(models.cities);
