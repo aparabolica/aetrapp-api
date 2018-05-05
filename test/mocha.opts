@@ -1,3 +1,3 @@
 --async-only
---globals app getUrl
+--globals app,unloggedUser,loggedAdmin,loggedRegularUser1
 --exit
