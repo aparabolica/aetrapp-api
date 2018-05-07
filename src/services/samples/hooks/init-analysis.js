@@ -1,3 +1,6 @@
+// Logger
+const logger = require('winston');
+
 // HTTP Client
 const axios = require('axios');
 
@@ -46,7 +49,8 @@ module.exports = function () {
         });
         return context;
       })
-      .catch(err => {
+      .catch((err) => {
+        logger.error('Error registering sample in IPS: ' + err.message);
         throw new errors.GeneralError('O serviço de imagens está indisponível. Por favor, tente novamente mais tarde.');
       });
   };
