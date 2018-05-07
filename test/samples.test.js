@@ -41,24 +41,22 @@ describe('Samples service', () => {
         .catch(err => { done(err); });
     });
 
-    it('After creating a sample, trap status should be "unprocessed" if IPS is not available', done => {
-      const trapService = global.loggedRegularUser1.service('traps');
+    it('Do not allow sample creation if IPS is not available', done => {
       const sampleService = global.loggedRegularUser1.service('samples');
       sampleService.create({
         base64: fakeBase64Image,
         collectedAt: Date.now(),
         trapId
       })
-        .then(async sample => {
-          if (sample && typeof sample.id == 'string') {
-            const trap = await trapService.get(trapId);
-            sample.should.have.property('status', 'unprocessed');
-            trap.should.have.property('status', 'unprocessed');
-            done();
-          }
-          else done(new Error('Invalid sample creation.'));
+        .then(() => {
+          done(new Error('Sample creation should not be allowed when IPS is unavailable.'));
         })
-        .catch(err => { done(err); });
+        .catch(async err => {
+          const errorMessage = 'O serviço de imagens está indisponível. Por favor, tente novamente mais tarde.';
+          if (err.message != errorMessage)
+            done(new Error('Invalid error message: ' + err.message));
+          else done();
+        });
     });
 
     it('After creating a sample, trap status should be "analysing" if IPS is available', done => {
@@ -86,7 +84,7 @@ describe('Samples service', () => {
         .catch(err => { done(err); });
     });
 
-    it('When IPS return "valid" analisys, match trap status accordingly', done => {
+    it('When IPS return "valid" analysis, match trap status accordingly', done => {
       const trapService = global.loggedRegularUser1.service('traps');
       const sampleService = global.loggedRegularUser1.service('samples');
       request({
@@ -137,6 +135,8 @@ describe('Samples service', () => {
     });
 
     it('enable sample analysis to be run more than one time');
+
+    it('forbid to send sample after cycle end');
 
     it('clean any other samples from cycle if a new is sent');
 

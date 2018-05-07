@@ -6,11 +6,14 @@ const config = require('config');
 const apiUrl = config.get('apiUrl');
 const ipsUrl = config.get("ipsUrl") + "/agenda/api/jobs/create";
 
+// Feathers Errors
+const errors = require("@feathersjs/errors");
+
 // Helpers
 const generateId = require("../../../helpers/generate-id");
 
 module.exports = function () {
-  return function (context) {
+  return async function (context) {
 
     const jobId = generateId();
 
@@ -24,7 +27,7 @@ module.exports = function () {
       return context;
     }
 
-    axios
+    await axios
       .post(ipsUrl, {
         jobName: "process image",
         jobSchedule: "now",
@@ -41,17 +44,10 @@ module.exports = function () {
           error: null,
           jobId: jobId
         });
+        return context;
       })
       .catch(err => {
-        let errorMessage = "Erro ao solicitar serviço de análise.";
-        if (err.code == "ECONNREFUSED") errorMessage = "O serviço de processamento de imagens está indisponível.";
-        context.data = Object.assign(context.data, {
-          status: "unprocessed",
-          error: {
-            code: "500",
-            message: errorMessage
-          }
-        });
+        throw new errors.GeneralError('O serviço de imagens está indisponível. Por favor, tente novamente mais tarde.');
       });
   };
 };
