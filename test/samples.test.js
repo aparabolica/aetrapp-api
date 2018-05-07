@@ -86,7 +86,7 @@ describe('Samples service', () => {
         .catch(err => { done(err); });
     });
 
-    it('When IPS return valid analisys, match trap status accordingly', done => {
+    it('When IPS return "valid" analisys, match trap status accordingly', done => {
       const trapService = global.loggedRegularUser1.service('traps');
       const sampleService = global.loggedRegularUser1.service('samples');
       request({
@@ -107,10 +107,34 @@ describe('Samples service', () => {
         trap.should.have.property('eggCount', sample.eggCount);
         done();
       }).catch(err => { done(err); });
-
     });
 
-    it('when IPS return invalid sample, match trap accordingly');
+    it('when IPS return "invalid" sample, match trap accordingly', done => {
+      const trapService = global.loggedRegularUser1.service('traps');
+      const sampleService = global.loggedRegularUser1.service('samples');
+      request({
+        method: 'POST',
+        uri: `${apiUrl}/samples/analysis/${sample1.jobId}`,
+        body: {
+          results: {
+            error: {
+              code: "500",
+              name: "Internal error",
+              message: "O processo de análise retornou um erro inválido."
+            },
+            status: 'invalid'
+          }
+        },
+        json: true
+      }).then(async () => {
+        const trap = await trapService.get(trapId);
+        const sample = await sampleService.get(sample1.id);
+        sample.should.have.property('status', 'invalid');
+        trap.should.have.property('status', 'invalid');
+        trap.should.have.property('eggCount', null);
+        done();
+      }).catch(err => { done(err); });
+    });
 
     it('enable sample analysis to be run more than one time');
 
