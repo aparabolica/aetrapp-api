@@ -1,3 +1,6 @@
+// Logger
+const logger = require('winston');
+
 // Moment
 const moment = require("moment-timezone");
 moment.tz.setDefault("America/Sao_Paulo");
@@ -5,8 +8,7 @@ moment.tz.setDefault("America/Sao_Paulo");
 // Feathers
 const { restrictToRoles, associateCurrentUser } = require('feathers-authentication-hooks');
 const { authenticate } = require("@feathersjs/authentication").hooks;
-const errors = require("@feathersjs/errors");
-const { iff, isProvider, getItems } = require("feathers-hooks-common");
+const { iff, isProvider } = require("feathers-hooks-common");
 
 // Helpers
 const { scheduleNotification, unscheduleNotification } = require('../../helpers/push-notifications');
@@ -21,7 +23,7 @@ const restrict = [
       owner: true
     })
   ])
-]
+];
 
 module.exports = {
   before: {
@@ -35,16 +37,20 @@ module.exports = {
 
 
 function registerPushNotification() {
-  return function (hook) {
-    const { recipientId, title, payload, deliveryTime, type } = hook.data;
+  return function (context) {
+
+    // do not schedule notifications when testing
+    if (process.env.NODE_ENV == 'test') return context;
+
+    const { recipientId, title, payload, deliveryTime } = context.data;
 
     // if delivery time exists, always schedule to 8 AM
     if (deliveryTime) {
-      hook.data.deliveryTime = moment(deliveryTime).hours(8).minutes(0).seconds(0).milliseconds(0);
+      context.data.deliveryTime = moment(deliveryTime).hours(8).minutes(0).seconds(0).milliseconds(0);
 
       // do not set delivery time if event is in the past
-      if (hook.data.deliveryTime.toDate() < Date.now()) {
-        delete hook.data.deliveryTime;
+      if (context.data.deliveryTime.toDate() < Date.now()) {
+        delete context.data.deliveryTime;
       }
     }
 
@@ -52,31 +58,34 @@ function registerPushNotification() {
       recipientId,
       title,
       payload,
-      deliveryTime && hook.data.deliveryTime
+      deliveryTime && context.data.deliveryTime
     ).then(oneSignalId => {
-        hook.data.payload = {
-          ...hook.data.payload,
-          oneSignalId
-        }
-        return hook;
-      }).catch(err => {
-        console.log("Error registering notification at OneSignal: "+ err.message);
-        return hook;
-      });
-  }
+      context.data.payload = {
+        ...context.data.payload,
+        oneSignalId
+      };
+      return context;
+    }).catch(err => {
+      logger.error("Error registering notification at OneSignal: "+ err.message);
+      return context;
+    });
+  };
 }
 
 function cancelPushNotification() {
-  return function (hook) {
+  return function (context) {
 
-    hook.app
+    // do not unschedule notifications when testing
+    if (process.env.NODE_ENV == 'test') return context;
+
+    context.app
       .service("notifications")
-      .get(hook.id)
+      .get(context.id)
       .then(notification => {
         return unscheduleNotification(notification.payload.oneSignalId);
       })
       .catch(err => {
-        console.log("Error canceling notification at OneSignal: " + err.message);
+        logger.error("Error canceling notification at OneSignal: " + err.message);
       });
-    }
+  };
 }
