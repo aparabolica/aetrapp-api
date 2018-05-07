@@ -41,7 +41,28 @@ describe('Samples service', () => {
         .catch(err => { done(err); });
     });
 
-    it('After creating a sample, trap status should be "analysing"', done => {
+    it('After creating a sample, trap status should be "analysing" if IPS is available', done => {
+      const trapService = global.loggedRegularUser1.service('traps');
+      const sampleService = global.loggedRegularUser1.service('samples');
+      sampleService.create({
+        fakeIpsInitAnalysisSuccess: true,
+        base64: fakeBase64Image,
+        collectedAt: Date.now(),
+        trapId
+      })
+        .then(async sample => {
+          if (sample && typeof sample.id == 'string') {
+            const trap = await trapService.get(trapId);
+            sample.should.have.property('status', 'analysing');
+            trap.should.have.property('status', 'analysing');
+            done();
+          }
+          else done(new Error('Invalid sample creation.'));
+        })
+        .catch(err => { done(err); });
+    });
+
+    it('After creating a sample, trap status should be "unprocessed" if IPS is not available', done => {
       const trapService = global.loggedRegularUser1.service('traps');
       const sampleService = global.loggedRegularUser1.service('samples');
       sampleService.create({
@@ -52,14 +73,13 @@ describe('Samples service', () => {
         .then(async sample => {
           if (sample && typeof sample.id == 'string') {
             const trap = await trapService.get(trapId);
-            trap.should.have.property('status', 'analysing');
+            sample.should.have.property('status', 'unprocessed');
+            trap.should.have.property('status', 'unprocessed');
             done();
           }
           else done(new Error('Invalid sample creation.'));
         })
         .catch(err => { done(err); });
-
     });
-
   });
 });
