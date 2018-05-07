@@ -21,8 +21,9 @@ const { iff, getItems } = require("feathers-hooks-common");
 // Helper hooks
 const { doResolver } = require('../../hooks');
 const loadTrap = require('./hooks/load-trap');
-const updateTrapStatus = require('./hooks/update-trap-status');
-
+const loadSample = require('./hooks/load-sample');
+const matchTrapStatusToSample = require('./hooks/match-trap-status-to-sample');
+const initAnalysis = require('./hooks/init-analysis');
 
 /*
  * Hooks
@@ -48,66 +49,6 @@ const storeBlob = function () {
   };
 };
 
-// create analysis job
-const registerAnalysisJob = function () {
-  return function (hook) {
-
-    // Do not register do IPS while testing
-    if (process.env.NODE_ENV == 'test') return;
-
-    const ipsUrl = config.get("ipsUrl") + "/agenda/api/jobs/create";
-    const samples = hook.app.service("samples");
-    const jobId = generateId();
-    axios
-      .post(ipsUrl, {
-        jobName: "process image",
-        jobSchedule: "now",
-        jobData: {
-          image: {
-            url: `${apiUrl}/files/${hook.result.blobId}`
-          },
-          webhookUrl: `${apiUrl}/samples/analysis/${jobId}`
-        }
-      })
-      .then(() => {
-        samples.patch(hook.result.id, {
-          status: "analysing",
-          error: null,
-          jobId: jobId
-        });
-      })
-      .catch(err => {
-        let errorMessage = "Erro ao solicitar serviço de análise."
-        if (err.code == "ECONNREFUSED") errorMessage = "O serviço de processamento de imagens está indisponível.";
-        samples.patch(hook.result.id, {
-          status: "unprocessed",
-          error: {
-            code: "500",
-            message: errorMessage
-          }
-        });
-      });
-  };
-};
-
-const loadSample = function () {
-  return function (hook) {
-    return hook.app
-      .service("samples")
-      .get(hook.id)
-      .then(sample => {
-        if (sample) {
-          hook.sample = sample;
-          return hook;
-        }
-        else new errors.BadRequest("Could not find sample.");
-      })
-      .catch(err => {
-        return new errors.GeneralError("Internal error.");
-      });
-  };
-};
-
 const startAnalysis = function () {
   return function (hook) {
     return registerAnalysis(hook)
@@ -120,14 +61,13 @@ const startAnalysis = function () {
         } else {
           throw new errors.GeneralError("Não foi possível completar a ação, por favor, contate o suporte.");
         }
-      })
-  }
-}
+      });
+  };
+};
 
 const registerAnalysis = function (hook) {
   const sample = hook.sample || hook.result;
   const ipsUrl = hook.app.get("ipsUrl") + "/agenda/api/jobs/create";
-  const samples = hook.app.service("samples");
   const jobId = generateId();
   if (hook.method == "patch") hook.data.jobId = jobId;
   return axios
@@ -143,8 +83,8 @@ const registerAnalysis = function (hook) {
     })
     .then(res => {
       return hook;
-    })
-}
+    });
+};
 
 const removeSameDayDuplicates = function (hook) {
   return function (hook) {
@@ -174,7 +114,7 @@ const removeSameDayDuplicates = function (hook) {
       return new errors.GeneralError("Internal error.");
     });
   };
-}
+};
 
 const addNotification = function () {
   return function (hook) {
@@ -197,8 +137,8 @@ const addNotification = function () {
         console.log('Error creating notification');
         console.log(err);
       });
-  }
-}
+  };
+};
 
 
 const sampleResolvers = {
@@ -211,13 +151,13 @@ const sampleResolvers = {
           query: {
             $select: ['id', 'firstName', 'lastName']
           }
-        }))
+        }));
       } catch (error) {
         console.log(`User ${sample.ownerId} not found for sample ${sample.id}.`);
       }
     }
   }
-}
+};
 
 module.exports = {
   before: {
@@ -228,13 +168,13 @@ module.exports = {
       authenticate("jwt"),
       associateCurrentUser({ idField: "id", as: "ownerId" }),
       loadTrap(),
-      storeBlob()
+      storeBlob(),
+      initAnalysis()
     ],
-    update: [...restrict],
     patch: [
       ...restrict,
       iff(
-        hook => { return hook.data && hook.data.status == "analysing" && !hook.data.jobId },
+        hook => { return hook.data && hook.data.status == "analysing" && !hook.data.jobId; },
         [loadSample(), startAnalysis()]
       )
     ],
@@ -245,52 +185,21 @@ module.exports = {
     all: [],
     find: [doResolver(sampleResolvers)],
     create: [
-      registerAnalysisJob(),
-      updateTrapStatus('analysing'),
+      matchTrapStatusToSample(),
       removeSameDayDuplicates()
     ],
-    update: [],
     patch: [
-      async context => {
-
-        const traps = context.app.service("traps");
-        const samples = context.app.service("samples");
-        const cities = context.app.service("cities");
-
-        // load sample if not available
-        let { sample } = context;
-        if (!sample) {
-          const samples = context.app.service("samples");
-          sample = await samples.get(context.id, {
-            skipResolver: true
-          });
-        }
-
-        // load trap if not available
-        let { trap } = context;
-        if (!trap) {
-          const traps = context.app.service("traps");
-          trap = await traps.get(sample.trapId, {
-            skipResolver: true
-          });
-        }
-
-        // if sample has valid count, update trap statitics
-        if (context.data && context.data.status == "valid") {
-
-          // Load sample to get trapId
-          samples
-            .get(context.id, { skipResolver: true })
-            .then(sample => {
-              traps.patch(sample.trapId, {}, { skipResolver: true })
-            });
-        }
-      },
+      iff(context => {
+        return context.data && context.data.status;
+      }, [
+        loadTrap(),
+        matchTrapStatusToSample()
+      ]),
       iff(
-        hook => { return hook.data && hook.data.status != "analysing" },
+        hook => { return hook.data && hook.data.status != "analysing"; },
         addNotification()
       )
-    ], // ips result
+    ],
     remove: []
   },
 
@@ -299,7 +208,6 @@ module.exports = {
     find: [],
     get: [],
     create: [],
-    update: [],
     patch: [],
     remove: []
   }

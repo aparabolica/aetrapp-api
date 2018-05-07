@@ -1,4 +1,5 @@
 // Initializes the `samples` service on path `/samples`
+const logger = require('winston');
 const createService = require("feathers-sequelize");
 const createModel = require("../../models/samples.model");
 const hooks = require("./samples.hooks");
@@ -23,24 +24,29 @@ module.exports = function () {
   // Get our initialized service so that we can register hooks and filters
   const samplesService = app.service("samples");
 
-  app.use("/samples/analysis/:id", (req, res) => {
+  /*
+   * Define webhook endpoint to be accessed by IPS
+   */
+  app.use("/samples/analysis/:id", async (req, res) => {
 
     // Get sample to patch
-    samplesService
+    return samplesService
       .find({ query: { jobId: req.params.id } })
       .then(samples => {
         const sample = samples.data[0];
-
         // Perform patch
         samplesService
           .patch(sample.id, { ...req.body.results })
-          .catch(err => {
-            console.log("Error patching sample with analysis result:", err.message);
+          .then(()=>{
+            return res.status(200).send('ok');
           })
-          .finally(() => res.send("ok"));
+          .catch(err => {
+            logger.error("Error patching sample with analysis result:", err.message);
+            return res.status(500).json({ error: err.message });
+          });
       })
-      .catch(() => {
-        res.send("ok");
+      .catch(err => {
+        res.status(404).json({ error: err.message });
       });
   });
 

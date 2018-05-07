@@ -10,9 +10,12 @@ module.exports = () => {
 
     const traps = context.app.service("traps");
     let { trap } = context;
-    if (trap)
-      await traps.patch(trap.id, { status: sample.status }, { skipResolver: true });
-    else
-      throw new errors.BadRequest('Trap does not exist.');
+    if (trap) {
+      await traps.patch(sample.trapId, {
+        eggCount: sample.status == 'valid' ? sample.eggCount : null,
+        status: sample.status
+      }, { skipResolver: true });
+      return context;
+    } else throw new errors.BadRequest('Trap does not exist.');
   };
 };
