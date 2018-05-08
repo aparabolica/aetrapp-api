@@ -3,6 +3,7 @@ const _ = require("lodash");
 // auth
 const { authenticate } = require("@feathersjs/authentication").hooks;
 const { restrictToRoles } = require("feathers-authentication-hooks");
+const simplifyGeojson = require("simplify-geojson");
 
 /*
  * Authentication
@@ -11,10 +12,17 @@ const { restrictToRoles } = require("feathers-authentication-hooks");
 const restrict = [
   authenticate("jwt"),
   restrictToRoles({
-    roles: ['admin'],
+    roles: ["admin"],
     idField: "id"
   })
 ];
+
+const simplify = () => hook => {
+  if (hook.data.geojson) {
+    hook.data.geojson = simplifyGeojson(hook.data.geojson, 0.01);
+  }
+  return hook;
+};
 
 /*
  * The hooks
@@ -27,6 +35,7 @@ module.exports = {
     get: [],
     create: [
       ...restrict,
+      simplify(),
       context => {
         const { geojson } = context.data;
 
@@ -34,13 +43,16 @@ module.exports = {
           let properties = [];
 
           geojson.features.forEach(feature => {
-            properties = feature.properties && _.union(properties, _.keys(feature.properties));
+            properties =
+              feature.properties &&
+              _.union(properties, _.keys(feature.properties));
           });
 
           context.data.properties = properties;
         }
-      }],
-    patch: [...restrict],
+      }
+    ],
+    patch: [...restrict, simplify()],
     remove: [...restrict]
   },
 
